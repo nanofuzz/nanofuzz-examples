@@ -1,0 +1,8 @@
+{
+  // Force markdown files to open in preview
+  "workbench.editorAssociations": {
+    "*.md": "vscode.markdown.preview.editor"
+  },
+  // Hide NaNofuzz button on validator functions
+  "nanofuzz.ui.codeLens.includeValidators": false,
+}

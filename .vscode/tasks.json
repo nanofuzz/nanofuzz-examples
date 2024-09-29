@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Install Extensions",
+        "type": "shell",      
+        "command": "code --install-extension penrose.nanofuzz",
+        "runOptions": {
+          "runOn": "folderOpen",
+        },
+        "presentation": {
+          "reveal": "never",
+          "close" : true,
+        }
+      }
+    ]
+  }
