@@ -513,10 +513,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@nanofuzz/runtime@0.3.6":
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/@nanofuzz/runtime/-/runtime-0.3.6.tgz#47397d19401faf0145c2f28ca20af18ce9f411a7"
-  integrity sha512-S3ulJuS9YdWb1PqpTcZdn8dnuM+bR/72PrMkm8Iy8LEaju2qEqcA7WLcjBcZAaTKHEtaaMN1Pxq/Qpti42gRog==
+"@nanofuzz/runtime@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@nanofuzz/runtime/-/runtime-0.3.1.tgz#c5c6b9a3d09a20341d0978934f209de442e07e45"
+  integrity sha512-9A8PR61b/MMMjVZQYObuL7QRwrEwdfdRJT+javihbBZF7JdMlKD9qsXx1pznce0absGnRv2xGnfH3iZHdDVbTQ==
 
 "@sinclair/typebox@^0.27.8":
   version "0.27.8"
