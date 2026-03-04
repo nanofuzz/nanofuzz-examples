@@ -20,7 +20,7 @@
     "noUnusedLocals": false,
     "skipLibCheck": true,
     "downlevelIteration": true,
-    "types": ["jest", "node", "tslib"],
+    "types": ["jest", "node"],
     "esModuleInterop": true,
     "isolatedModules": false,
     "strict": true,
