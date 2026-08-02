@@ -3,6 +3,12 @@
   "workbench.editorAssociations": {
     "*.md": "vscode.markdown.preview.editor"
   },
+  // Use the repository's TypeScript and Python environments
+  "js/ts.tsdk.path": "./node_modules/typescript/lib",
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+  "python.terminal.activateEnvironment": true,
+  "python-envs.workspaceSearchPaths": ["./.venv"],
   // Hide NaNofuzz button on validator functions
   "nanofuzz.ui.codeLens.includeValidators": false,
 }
