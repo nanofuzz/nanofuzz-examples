@@ -1,6 +1,6 @@
 use nanofuzz_runtime::assume;
 
-/**
+/*
  * Arithmetic Expression Evaluator and Grammar-Based Input Generator
  *
  * Grammar:

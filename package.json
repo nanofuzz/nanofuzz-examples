@@ -1,6 +1,9 @@
 {
   "name": "nanofuzz-examples",
   "version": "0.3.5",
+  "dependencies": {
+    "@nanofuzz/cli": "^0.4.0"
+  },
   "devDependencies": {
     "@nanofuzz/runtime": "0.4.0",
     "@types/jest": "^30.0.0",
@@ -18,10 +21,13 @@
       "<rootDir>/examples/"
     ],
     "testPathIgnorePatterns": [
-      "build/"
+      "build/",
+      "tests/cli_smoke.test.ts"
     ]
   },
   "scripts": {
-    "test": "jest --watchAll=false"
+    "test": "jest --watchAll=false",
+    "test:cli": "jest tests/cli_smoke.test.ts --testPathIgnorePatterns=build/ --watchAll=false --runInBand",
+    "test:all": "jest --testPathIgnorePatterns=build/ --watchAll=false"
   }
 }
