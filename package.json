@@ -7,7 +7,7 @@
     "jest": "^30.2.0",
     "ts-jest": "^29.4.5",
     "tslib": "^2.8.1",
-    "typescript": "^4"
+    "typescript": "5.9.2"
   },
   "jest": {
     "preset": "ts-jest",
