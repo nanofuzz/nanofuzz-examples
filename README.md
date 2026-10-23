@@ -5,21 +5,26 @@ A set of buggy example programs for playing with [NaNofuzz](https://github.com/n
 ```
 ./
   tutorial/            NaNofuzz tutorial
-  examples/            TypeScript and Python NaNofuzz examples
+  examples/
+    ts/                TypeScript NaNofuzz examples
+    py/                Python NaNofuzz examples
+    rs/                Rust NaNofuzz examples
 ```
 
 Several of the example programs have bugs that may be detected using NaNofuzz' heuristic validator.
 Other examples (e.g., roman, lcm, identitymatrix, modinv, normd) require human or property validators to identify some of the bugs.
+Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/ts/expression_parser.ts`, `examples/py/expression_parser.py`, and `examples/rs/expression_parser.rs`).
 
 ## Setup
 
-The Codespace installs the Node.js and Python dependencies automatically. For a
-local checkout, install the TypeScript dependencies and create the Python
-virtual environment:
+The Codespace installs the Node.js, Python, and Rust dependencies automatically. For a
+local checkout, install the TypeScript dependencies, create the Python
+virtual environment, and build the Rust crate:
 
 ```sh
 yarn install
 python -m venv .venv
+cargo build
 ```
 
 On Linux or macOS:
@@ -34,5 +39,8 @@ On Windows:
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
-Run the example smoke tests with `.venv/bin/python -m pytest` on Linux or
-macOS, or `.venv\Scripts\python.exe -m pytest` on Windows.
+### Running Smoke Tests
+
+- **TypeScript**: `yarn test`
+- **Python**: `PYTHONPATH=. .venv/bin/pytest` on Linux or macOS, or `.venv\Scripts\pytest.exe` on Windows.
+- **Rust**: `cargo test`

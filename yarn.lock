@@ -619,10 +619,10 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
-"@nanofuzz/runtime@0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@nanofuzz/runtime/-/runtime-0.3.1.tgz#c5c6b9a3d09a20341d0978934f209de442e07e45"
-  integrity sha512-9A8PR61b/MMMjVZQYObuL7QRwrEwdfdRJT+javihbBZF7JdMlKD9qsXx1pznce0absGnRv2xGnfH3iZHdDVbTQ==
+"@nanofuzz/runtime@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@nanofuzz/runtime/-/runtime-0.4.0.tgz#e316490629a193c9de229edb1719ab51937fad27"
+  integrity sha512-F3hhw5NLtLZOhQPtXHEbvrOyJcyvr/4Y+BSz4l1eLAUChmWf+VIZYvGOthWBssQGRs3Wxi/VnsDW7U92DYowFQ==
 
 "@napi-rs/wasm-runtime@^0.2.11":
   version "0.2.12"
