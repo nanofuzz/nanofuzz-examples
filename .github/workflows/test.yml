@@ -48,6 +48,18 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
+
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: "3.9.6"
+
       - name: Install Yarn dependencies
         run: yarn
 
@@ -59,6 +71,9 @@ jobs:
 
       - name: Rust tests
         run: cargo test
+
+      - name: Java tests
+        run: mvn test
 
       - name: CLI smoke tests
         run: yarn test:cli
