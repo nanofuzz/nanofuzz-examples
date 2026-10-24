@@ -1,0 +1,2 @@
+(dirs :standard \ node_modules target _build .venv build)
+

@@ -1,0 +1,4 @@
+(library
+ (name oxcaml_examples)
+ (public_name nanofuzz_examples.oxcaml)
+ (libraries nanofuzz_runtime yojson msgpck))
