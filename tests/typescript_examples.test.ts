@@ -2,10 +2,10 @@ import { maxOfArray } from "../examples/ts/maxofarray";
 import {
   evaluateExpression,
   evaluateExpressionTransformer,
-} from "../examples/ts/expression_parser";
-import { CircularBuffer } from "../examples/ts/circular_buffer";
-import { MinStack } from "../examples/ts/min_stack";
-import { LRUCache } from "../examples/ts/lru_cache";
+} from "../examples/ts/expressionparser";
+import { CircularBuffer } from "../examples/ts/circularbuffer";
+import { MinStack } from "../examples/ts/minstack";
+import { LRUCache } from "../examples/ts/lrucache";
 import { UnsatisfiedAssumption } from "@nanofuzz/runtime";
 
 describe("TypeScript examples", () => {

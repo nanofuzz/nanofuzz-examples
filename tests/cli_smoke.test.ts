@@ -1,15 +1,18 @@
 import { spawnSync } from "child_process";
 
 const TS_TARGETS = [
+  "examples/ts/circularbuffer.ts::testCircularBuffer",
   "examples/ts/dinners.ts::totalDinnerExpenses",
-  "examples/ts/expression_parser.ts::evaluateExpression",
+  "examples/ts/expressionparser.ts::evaluateExpression",
   "examples/ts/getoffset.ts::getOffsetOrDefault",
   "examples/ts/getzero.ts::getZero",
   "examples/ts/gramschmidt.ts::gramSchmidt",
   "examples/ts/identitymatrix.ts::identity",
   "examples/ts/lcm.ts::lcm",
   "examples/ts/levenshtein.ts::levenshtein",
+  "examples/ts/lrucache.ts::testLRUCache",
   "examples/ts/maxofarray.ts::maxOfArray",
+  "examples/ts/minstack.ts::testMinStack",
   "examples/ts/minsalary.ts::minSalary",
   "examples/ts/modinv.ts::modInv",
   "examples/ts/normd.ts::normalDistributionPDF",
@@ -22,13 +25,21 @@ const TS_TARGETS = [
 ];
 
 const PY_TARGETS = [
+  "examples/py/circular_buffer.py::test_circular_buffer",
   "examples/py/expression_parser.py::evaluate_expression",
   "examples/py/lcm.py::lcm",
+  "examples/py/lru_cache.py::test_lru_cache",
   "examples/py/maxofarray.py::max_of_array",
+  "examples/py/min_stack.py::test_min_stack",
   "examples/py/primefactorize.py::prime_factorize",
 ];
 
-const RS_TARGETS = ["examples/rs/expression_parser.rs::evaluate_expression"];
+const RS_TARGETS = [
+  "examples/rs/circular_buffer.rs::test_circular_buffer",
+  "examples/rs/expression_parser.rs::evaluate_expression",
+  "examples/rs/lru_cache.rs::test_lru_cache",
+  "examples/rs/min_stack.rs::test_min_stack",
+];
 
 const TUTORIAL_TARGETS = ["tutorial/tutorial.ts::findMedianSortedArrays"];
 

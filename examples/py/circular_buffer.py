@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, Literal, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 
@@ -100,3 +100,67 @@ class CircularBuffer(Generic[T]):
             if item is not None:
                 result.append(item)
         return result
+
+
+def test_circular_buffer(
+    capacity: int,
+    operations: List[Tuple[Literal["push", "pop", "peek", "clear"], int]],
+) -> bool:
+    """Test harness verifying that CircularBuffer maintains all invariants across operations."""
+    if capacity <= 0 or capacity > 64:
+        return True
+
+    cb: CircularBuffer[int] = CircularBuffer(capacity)
+    shadow: List[int] = []
+
+    for op, val in operations:
+        if op == "push":
+            added = cb.push(val)
+            if len(shadow) < capacity:
+                assert added, "push failed when capacity was available"
+                shadow.append(val)
+            else:
+                assert not added, "push succeeded when buffer was full"
+        elif op == "pop":
+            popped = cb.pop()
+            if shadow:
+                expected = shadow.pop(0)
+                assert popped == expected, f"pop returned {popped}, expected {expected}"
+            else:
+                assert popped is None, f"pop returned {popped} on empty buffer"
+        elif op == "peek":
+            peeked = cb.peek()
+            expected = shadow[0] if shadow else None
+            assert peeked == expected, f"peek returned {peeked}, expected {expected}"
+        elif op == "clear":
+            cb.clear()
+            shadow.clear()
+
+        assert cb.size() == len(
+            shadow), f"size {cb.size()} does not match shadow {len(shadow)}"
+        assert cb.is_empty() == (len(shadow) == 0), "is_empty inconsistent with shadow length"
+        assert cb.is_full() == (len(shadow) == capacity), "is_full inconsistent with capacity"
+        assert cb.to_list(
+        ) == shadow, f"to_list {cb.to_list()} does not match shadow {shadow}"
+
+    return True
+
+
+def test_circular_buffer_generator(
+    prng: Any,
+) -> Optional[Tuple[int, List[Tuple[Literal["push", "pop", "peek", "clear"], int]]]]:
+    """User-provided input generator producing realistic circular buffer operation sequences."""
+    cap = int(prng() * 8) + 1
+    op_count = int(prng() * 10) + 1
+    op_names: List[Literal["push", "pop", "peek", "clear"]] = [
+        "push",
+        "pop",
+        "peek",
+        "clear",
+    ]
+    ops: List[Tuple[Literal["push", "pop", "peek", "clear"], int]] = []
+    for _ in range(op_count):
+        op = op_names[int(prng() * len(op_names))]
+        val = int(prng() * 100)
+        ops.append((op, val))
+    return (cap, ops)

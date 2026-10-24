@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, TypeVar
+from typing import Any, Generic, List, Literal, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 
@@ -76,3 +76,60 @@ class MinStack(Generic[T]):
     def to_list(self) -> List[T]:
         """Returns a copy of elements from bottom to top."""
         return list(self._elements)
+
+
+def test_min_stack(
+    operations: List[Tuple[Literal["push", "pop", "top", "min", "clear"], int]],
+) -> bool:
+    """Test harness verifying that MinStack maintains all invariants across operations."""
+    ms: MinStack[int] = MinStack()
+    shadow: List[int] = []
+
+    for op, val in operations:
+        if op == "push":
+            ms.push(val)
+            shadow.append(val)
+        elif op == "pop":
+            popped = ms.pop()
+            expected = shadow.pop() if shadow else None
+            assert popped == expected, f"pop returned {popped}, expected {expected}"
+        elif op == "top":
+            topped = ms.top()
+            expected = shadow[-1] if shadow else None
+            assert topped == expected, f"top returned {topped}, expected {expected}"
+        elif op == "min":
+            min_val = ms.get_min()
+            expected = min(shadow) if shadow else None
+            assert min_val == expected, f"get_min returned {min_val}, expected {expected}"
+        elif op == "clear":
+            ms.clear()
+            shadow.clear()
+
+        assert ms.size() == len(
+            shadow), f"size {ms.size()} mismatch with shadow {len(shadow)}"
+        assert ms.is_empty() == (len(shadow) == 0), "is_empty inconsistent with shadow length"
+        current_min = ms.get_min()
+        expected_min = min(shadow) if shadow else None
+        assert current_min == expected_min, f"invariant get_min {current_min} != expected {expected_min}"
+
+    return True
+
+
+def test_min_stack_generator(
+    prng: Any,
+) -> Optional[Tuple[List[Tuple[Literal["push", "pop", "top", "min", "clear"], int]]]]:
+    """User-provided input generator producing realistic MinStack operation sequences."""
+    op_count = int(prng() * 10) + 1
+    op_names: List[Literal["push", "pop", "top", "min", "clear"]] = [
+        "push",
+        "pop",
+        "top",
+        "min",
+        "clear",
+    ]
+    ops: List[Tuple[Literal["push", "pop", "top", "min", "clear"], int]] = []
+    for _ in range(op_count):
+        op = op_names[int(prng() * len(op_names))]
+        val = int(prng() * 200) - 100
+        ops.append((op, val))
+    return (ops,)

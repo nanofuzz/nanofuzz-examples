@@ -1,3 +1,5 @@
+import assert from "assert";
+
 /**
  * LIFO Stack that supports push, pop, top, and retrieving the minimum element in O(1) time.
  *
@@ -101,3 +103,89 @@ export class MinStack<T = number> {
     return [...this.elements];
   } // fn: toArray
 }
+
+/**
+ * Test harness verifying that MinStack maintains all invariants across
+ * a sequence of operations.
+ *
+ * @param operations Sequence of [operation, value] pairs to execute
+ * @returns `true` if all operations and invariants succeed
+ */
+export function testMinStack(operations: [MinStackOp, number][]): boolean {
+  const ms = new MinStack<number>();
+  const shadow: number[] = [];
+
+  for (const [op, val] of operations) {
+    if (op === "push") {
+      ms.push(val);
+      shadow.push(val);
+    } else if (op === "pop") {
+      const popped = ms.pop();
+      const expected = shadow.pop();
+      assert.strictEqual(
+        popped,
+        expected,
+        `pop returned ${popped}, expected ${expected}`,
+      );
+    } else if (op === "top") {
+      const topped = ms.top();
+      const expected =
+        shadow.length > 0 ? shadow[shadow.length - 1] : undefined;
+      assert.strictEqual(
+        topped,
+        expected,
+        `top returned ${topped}, expected ${expected}`,
+      );
+    } else if (op === "min") {
+      const minVal = ms.getMin();
+      const expected = shadow.length > 0 ? Math.min(...shadow) : undefined;
+      assert.strictEqual(
+        minVal,
+        expected,
+        `getMin returned ${minVal}, expected ${expected}`,
+      );
+    } else if (op === "clear") {
+      ms.clear();
+      shadow.length = 0;
+    }
+
+    assert.strictEqual(
+      ms.size(),
+      shadow.length,
+      `size ${ms.size()} mismatch with shadow length ${shadow.length}`,
+    );
+    assert.strictEqual(
+      ms.isEmpty(),
+      shadow.length === 0,
+      `isEmpty ${ms.isEmpty()} inconsistent with shadow length ${shadow.length}`,
+    );
+    const currentMin = ms.getMin();
+    const expectedMin = shadow.length > 0 ? Math.min(...shadow) : undefined;
+    assert.strictEqual(
+      currentMin,
+      expectedMin,
+      `invariant getMin ${currentMin} !== expected ${expectedMin}`,
+    );
+  }
+
+  return true;
+} // fn: testMinStack
+
+/**
+ * User-provided input generator producing realistic MinStack operation sequences.
+ */
+export function testMinStackGenerator(
+  prng: () => number,
+): Parameters<typeof testMinStack> {
+  const opCount = Math.floor(prng() * 10) + 1;
+  const opNames: MinStackOp[] = ["push", "pop", "top", "min", "clear"];
+  const ops: [MinStackOp, number][] = [];
+  for (let i = 0; i < opCount; i++) {
+    const op = opNames[Math.floor(prng() * opNames.length)];
+    const val = Math.floor(prng() * 200) - 100;
+    ops.push([op, val]);
+  }
+  return [ops];
+} // fn: testMinStackGenerator
+
+export type MinStackOp = "push" | "pop" | "top" | "min" | "clear";

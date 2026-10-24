@@ -13,7 +13,7 @@ A set of buggy example programs for playing with [NaNofuzz](https://github.com/n
 
 Several of the example programs have bugs that may be detected using NaNofuzz' heuristic validator.
 Other examples (e.g., roman, lcm, identitymatrix, modinv, normd) require human or property validators to identify some of the bugs.
-Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/ts/expression_parser.ts`, `examples/py/expression_parser.py`, and `examples/rs/expression_parser.rs`).
+Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/ts/expressionparser.ts`, `examples/py/expression_parser.py`, and `examples/rs/expression_parser.rs`).
 
 ## Setup
 
