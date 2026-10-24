@@ -1,6 +1,97 @@
 import assert from "assert";
 
 /**
+ * Test harness verifying that CircularBuffer maintains all invariants across
+ * a sequence of operations.
+ *
+ * @param capacity Maximum capacity of the buffer
+ * @param operations Sequence of [operation, value] pairs to execute
+ * @returns `true` if all operations and invariants succeed
+ */
+export function testCircularBuffer(
+  capacity: number,
+  operations: [CircularBufferOp, number][],
+): boolean {
+  if (capacity <= 0 || capacity > 64 || !Number.isInteger(capacity)) {
+    return true;
+  }
+  const cb = new CircularBuffer<number>(capacity);
+  const shadow: number[] = [];
+
+  for (const [op, val] of operations) {
+    if (op === "push") {
+      const added = cb.push(val);
+      if (shadow.length < capacity) {
+        assert(added, "push failed when capacity was available");
+        shadow.push(val);
+      } else {
+        assert(!added, "push succeeded when buffer was full");
+      }
+    } else if (op === "pop") {
+      const popped = cb.pop();
+      if (shadow.length > 0) {
+        const expected = shadow.shift();
+        assert.strictEqual(
+          popped,
+          expected,
+          `pop returned ${popped}, expected ${expected}`,
+        );
+      } else {
+        assert.strictEqual(
+          popped,
+          undefined,
+          `pop returned ${popped} on empty buffer`,
+        );
+      }
+    } else if (op === "peek") {
+      const peeked = cb.peek();
+      const expected = shadow.length > 0 ? shadow[0] : undefined;
+      assert.strictEqual(
+        peeked,
+        expected,
+        `peek returned ${peeked}, expected ${expected}`,
+      );
+    } else if (op === "clear") {
+      cb.clear();
+      shadow.length = 0;
+    }
+
+    assert.strictEqual(cb.size(), shadow.length, "size mismatch");
+    assert.strictEqual(
+      cb.isEmpty(),
+      shadow.length === 0,
+      "isEmpty inconsistent with size",
+    );
+    assert.strictEqual(
+      cb.isFull(),
+      shadow.length === capacity,
+      "isFull inconsistent with capacity",
+    );
+    assert.deepStrictEqual(cb.toArray(), shadow, "toArray mismatch");
+  }
+
+  return true;
+} // fn: testCircularBuffer
+
+/**
+ * User-provided input generator producing realistic circular buffer operation sequences.
+ */
+export function testCircularBufferGenerator(
+  prng: () => number,
+): Parameters<typeof testCircularBuffer> {
+  const cap = Math.floor(prng() * 8) + 1;
+  const opCount = Math.floor(prng() * 10) + 1;
+  const opNames: CircularBufferOp[] = ["push", "pop", "peek", "clear"];
+  const ops: [CircularBufferOp, number][] = [];
+  for (let i = 0; i < opCount; i++) {
+    const op = opNames[Math.floor(prng() * opNames.length)];
+    const val = Math.floor(prng() * 100);
+    ops.push([op, val]);
+  }
+  return [cap, ops];
+} // fn: testCircularBufferGenerator
+
+/**
  * Fixed-capacity circular FIFO buffer (ring buffer).
  *
  * A circular buffer allocates a fixed-size contiguous array and uses two
@@ -135,96 +226,5 @@ export class CircularBuffer<T> {
     return result;
   } // fn: toArray
 }
-
-/**
- * Test harness verifying that CircularBuffer maintains all invariants across
- * a sequence of operations.
- *
- * @param capacity Maximum capacity of the buffer
- * @param operations Sequence of [operation, value] pairs to execute
- * @returns `true` if all operations and invariants succeed
- */
-export function testCircularBuffer(
-  capacity: number,
-  operations: [CircularBufferOp, number][],
-): boolean {
-  if (capacity <= 0 || capacity > 64 || !Number.isInteger(capacity)) {
-    return true;
-  }
-  const cb = new CircularBuffer<number>(capacity);
-  const shadow: number[] = [];
-
-  for (const [op, val] of operations) {
-    if (op === "push") {
-      const added = cb.push(val);
-      if (shadow.length < capacity) {
-        assert(added, "push failed when capacity was available");
-        shadow.push(val);
-      } else {
-        assert(!added, "push succeeded when buffer was full");
-      }
-    } else if (op === "pop") {
-      const popped = cb.pop();
-      if (shadow.length > 0) {
-        const expected = shadow.shift();
-        assert.strictEqual(
-          popped,
-          expected,
-          `pop returned ${popped}, expected ${expected}`,
-        );
-      } else {
-        assert.strictEqual(
-          popped,
-          undefined,
-          `pop returned ${popped} on empty buffer`,
-        );
-      }
-    } else if (op === "peek") {
-      const peeked = cb.peek();
-      const expected = shadow.length > 0 ? shadow[0] : undefined;
-      assert.strictEqual(
-        peeked,
-        expected,
-        `peek returned ${peeked}, expected ${expected}`,
-      );
-    } else if (op === "clear") {
-      cb.clear();
-      shadow.length = 0;
-    }
-
-    assert.strictEqual(cb.size(), shadow.length, "size mismatch");
-    assert.strictEqual(
-      cb.isEmpty(),
-      shadow.length === 0,
-      "isEmpty inconsistent with size",
-    );
-    assert.strictEqual(
-      cb.isFull(),
-      shadow.length === capacity,
-      "isFull inconsistent with capacity",
-    );
-    assert.deepStrictEqual(cb.toArray(), shadow, "toArray mismatch");
-  }
-
-  return true;
-} // fn: testCircularBuffer
-
-/**
- * User-provided input generator producing realistic circular buffer operation sequences.
- */
-export function testCircularBufferGenerator(
-  prng: () => number,
-): Parameters<typeof testCircularBuffer> {
-  const cap = Math.floor(prng() * 8) + 1;
-  const opCount = Math.floor(prng() * 10) + 1;
-  const opNames: CircularBufferOp[] = ["push", "pop", "peek", "clear"];
-  const ops: [CircularBufferOp, number][] = [];
-  for (let i = 0; i < opCount; i++) {
-    const op = opNames[Math.floor(prng() * opNames.length)];
-    const val = Math.floor(prng() * 100);
-    ops.push([op, val]);
-  }
-  return [cap, ops];
-} // fn: testCircularBufferGenerator
 
 export type CircularBufferOp = "push" | "pop" | "peek" | "clear";

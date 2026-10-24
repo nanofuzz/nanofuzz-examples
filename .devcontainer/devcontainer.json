@@ -22,15 +22,12 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
 
-  // Use 'updateContentCommand' to prepare dependencies before connecting.
-  "updateContentCommand": "python -m venv .venv && .venv/bin/python -m pip install -r requirements.txt && yarn install && cargo build",
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build",
 
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
-      "settings": {
-        "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python"
-      },
       "extensions": [
         "firsttris.vscode-jest-runner",
         "ms-python.python",

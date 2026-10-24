@@ -1,4 +1,109 @@
-from typing import Any, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
+from __future__ import annotations
+
+import random
+from typing import Callable, Dict, Generic, List, Literal, Optional, Tuple, TypeVar
+
+
+#
+# Test harness verifying that LRUCache maintains all invariants across
+# a sequence of operations.
+#
+# @param capacity Maximum capacity of the cache (1-32)
+# @param operations Sequence of [operation, key, value] tuples to execute
+# @returns True if all operations and invariants succeed
+#
+def test_lru_cache(
+    capacity: int,
+    operations: List[Tuple[Literal["put", "get", "has", "remove", "clear"], str, int]],
+) -> bool:
+    """Test harness verifying that LRUCache maintains all invariants across operations.
+
+    Args:
+        capacity: Maximum capacity of the LRU cache (1-32).
+        operations: Sequence of (operation, key, value) tuples to execute.
+
+    Returns:
+        True if all operations and invariants succeed.
+    """
+    if capacity <= 0 or capacity > 32:
+        return True
+
+    lru: LRUCache[str, int] = LRUCache(capacity)
+    shadow: Dict[str, int] = {}
+
+    for op, key, val in operations:
+        if op == "put":
+            lru.put(key, val)
+            if key in shadow:
+                del shadow[key]
+            elif len(shadow) >= capacity:
+                oldest = next(iter(shadow))
+                del shadow[oldest]
+            shadow[key] = val
+        elif op == "get":
+            got = lru.get(key)
+            expected = shadow.get(key)
+            assert got == expected, f"get({key}) returned {got}, expected {expected}"
+            if expected is not None:
+                del shadow[key]
+                shadow[key] = expected
+        elif op == "has":
+            had = lru.has(key)
+            expected = key in shadow
+            assert had == expected, f"has({key}) returned {had}, expected {expected}"
+        elif op == "remove":
+            removed = lru.remove(key)
+            expected = key in shadow
+            if expected:
+                del shadow[key]
+            assert removed == expected, f"remove({key}) returned {removed}, expected {expected}"
+        elif op == "clear":
+            lru.clear()
+            shadow.clear()
+
+        assert lru.size() == len(
+            shadow), f"size {lru.size()} does not match shadow {len(shadow)}"
+        assert lru.is_empty() == (len(shadow) == 0), "is_empty inconsistent with shadow size"
+        keys = lru.keys()
+        shadow_keys = list(shadow.keys())
+        assert keys == shadow_keys, f"keys {keys} does not match shadow keys {shadow_keys}"
+
+    return True
+
+
+#
+# User-provided input generator producing realistic LRU cache operation sequences.
+#
+def test_lru_cache_generator(
+    prng: Callable[[], float],
+) -> Optional[Tuple[int, List[Tuple[Literal["put", "get", "has", "remove", "clear"], str, int]]]]:
+    """User-provided input generator producing realistic LRU cache operation sequences.
+
+    Args:
+        prng: Pseudo-random number generator function returning float values in [0.0, 1.0).
+
+    Returns:
+        A tuple of (capacity, operations) or None when exhausted.
+    """
+    rng = prng if callable(prng) else random.Random(prng).random
+    cap = int(rng() * 4) + 1
+    op_count = int(rng() * 10) + 1
+    op_names: List[Literal["put", "get", "has", "remove", "clear"]] = [
+        "put",
+        "get",
+        "has",
+        "remove",
+        "clear",
+    ]
+    key_names = ["k1", "k2", "k3", "k4"]
+    ops: List[Tuple[Literal["put", "get", "has", "remove", "clear"], str, int]] = []
+    for _ in range(op_count):
+        op = op_names[int(rng() * len(op_names))]
+        key = key_names[int(rng() * len(key_names))]
+        val = int(rng() * 100)
+        ops.append((op, key, val))
+    return (cap, ops)
+
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -102,77 +207,3 @@ class LRUCache(Generic[K, V]):
     def keys(self) -> List[K]:
         """Returns all keys ordered from least recently used to most recently used."""
         return list(self._cache.keys())
-
-
-def test_lru_cache(
-    capacity: int,
-    operations: List[Tuple[Literal["put", "get", "has", "remove", "clear"], str, int]],
-) -> bool:
-    """Test harness verifying that LRUCache maintains all invariants across operations."""
-    if capacity <= 0 or capacity > 32:
-        return True
-
-    lru: LRUCache[str, int] = LRUCache(capacity)
-    shadow: Dict[str, int] = {}
-
-    for op, key, val in operations:
-        if op == "put":
-            lru.put(key, val)
-            if key in shadow:
-                del shadow[key]
-            elif len(shadow) >= capacity:
-                oldest = next(iter(shadow))
-                del shadow[oldest]
-            shadow[key] = val
-        elif op == "get":
-            got = lru.get(key)
-            expected = shadow.get(key)
-            assert got == expected, f"get({key}) returned {got}, expected {expected}"
-            if expected is not None:
-                del shadow[key]
-                shadow[key] = expected
-        elif op == "has":
-            had = lru.has(key)
-            expected = key in shadow
-            assert had == expected, f"has({key}) returned {had}, expected {expected}"
-        elif op == "remove":
-            removed = lru.remove(key)
-            expected = key in shadow
-            if expected:
-                del shadow[key]
-            assert removed == expected, f"remove({key}) returned {removed}, expected {expected}"
-        elif op == "clear":
-            lru.clear()
-            shadow.clear()
-
-        assert lru.size() == len(
-            shadow), f"size {lru.size()} does not match shadow {len(shadow)}"
-        assert lru.is_empty() == (len(shadow) == 0), "is_empty inconsistent with shadow size"
-        keys = lru.keys()
-        shadow_keys = list(shadow.keys())
-        assert keys == shadow_keys, f"keys {keys} does not match shadow keys {shadow_keys}"
-
-    return True
-
-
-def test_lru_cache_generator(
-    prng: Any,
-) -> Optional[Tuple[int, List[Tuple[Literal["put", "get", "has", "remove", "clear"], str, int]]]]:
-    """User-provided input generator producing realistic LRU cache operation sequences."""
-    cap = int(prng() * 4) + 1
-    op_count = int(prng() * 10) + 1
-    op_names: List[Literal["put", "get", "has", "remove", "clear"]] = [
-        "put",
-        "get",
-        "has",
-        "remove",
-        "clear",
-    ]
-    key_names = ["k1", "k2", "k3", "k4"]
-    ops: List[Tuple[Literal["put", "get", "has", "remove", "clear"], str, int]] = []
-    for _ in range(op_count):
-        op = op_names[int(prng() * len(op_names))]
-        key = key_names[int(prng() * len(key_names))]
-        val = int(prng() * 100)
-        ops.append((op, key, val))
-    return (cap, ops)
