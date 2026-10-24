@@ -8,7 +8,7 @@
     "sourceMap": true,
     "allowJs": true,
     "moduleResolution": "nodenext",
-    "rootDirs": ["examples"],
+    "rootDirs": ["examples", "examples/typescript"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
@@ -27,7 +27,7 @@
     "declaration": true,
     "declarationMap": true,
     "paths": {
-      "examples/*": ["./examples/*"]
+      "examples/*": ["./examples/*", "./examples/typescript/*"]
     }
   },
   "formatCodeOptions": {
@@ -52,8 +52,5 @@
     "placeOpenBraceOnNewLineForControlBlocks": false
   },
   "include": ["examples"],
-  "exclude": [
-    "node_modules",
-    "build"
-  ]
+  "exclude": ["node_modules", "build"]
 }

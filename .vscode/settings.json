@@ -11,4 +11,5 @@
   "python-envs.workspaceSearchPaths": ["./.venv"],
   // Hide NaNofuzz button on validator functions
   "nanofuzz.ui.codeLens.includeValidators": false,
+  "editor.formatOnSave": true
 }
