@@ -1,6 +1,109 @@
 import assert from "assert";
 
 /**
+ * Test harness verifying that LRUCache maintains all invariants across
+ * a sequence of operations.
+ *
+ * @param capacity Maximum capacity of the cache
+ * @param operations Sequence of [operation, key, value] tuples to execute
+ * @returns `true` if all operations and invariants succeed
+ */
+export function testLRUCache(
+  capacity: number,
+  operations: [LRUCacheOp, string, number][],
+): boolean {
+  if (capacity <= 0 || capacity > 32 || !Number.isInteger(capacity)) {
+    return true;
+  }
+  const lru = new LRUCache<string, number>(capacity);
+  const shadow = new Map<string, number>();
+
+  for (const [op, key, val] of operations) {
+    if (op === "put") {
+      lru.put(key, val);
+      if (shadow.has(key)) {
+        shadow.delete(key);
+      } else if (shadow.size >= capacity) {
+        const oldest = shadow.keys().next().value;
+        if (oldest !== undefined) {
+          shadow.delete(oldest);
+        }
+      }
+      shadow.set(key, val);
+    } else if (op === "get") {
+      const got = lru.get(key);
+      const expected = shadow.get(key);
+      assert.strictEqual(
+        got,
+        expected,
+        `get(${key}) returned ${got}, expected ${expected}`,
+      );
+      if (expected !== undefined) {
+        shadow.delete(key);
+        shadow.set(key, expected);
+      }
+    } else if (op === "has") {
+      const had = lru.has(key);
+      const expected = shadow.has(key);
+      assert.strictEqual(
+        had,
+        expected,
+        `has(${key}) returned ${had}, expected ${expected}`,
+      );
+    } else if (op === "remove") {
+      const removed = lru.remove(key);
+      const expected = shadow.delete(key);
+      assert.strictEqual(
+        removed,
+        expected,
+        `remove(${key}) returned ${removed}, expected ${expected}`,
+      );
+    } else if (op === "clear") {
+      lru.clear();
+      shadow.clear();
+    }
+
+    assert.strictEqual(
+      lru.size(),
+      shadow.size,
+      `size ${lru.size()} does not match shadow ${shadow.size}`,
+    );
+    assert.strictEqual(
+      lru.isEmpty(),
+      shadow.size === 0,
+      `isEmpty inconsistent with shadow size`,
+    );
+    assert.deepStrictEqual(
+      lru.keys(),
+      Array.from(shadow.keys()),
+      `keys mismatch`,
+    );
+  }
+
+  return true;
+} // fn: testLRUCache
+
+/**
+ * User-provided input generator producing realistic LRU cache operation sequences.
+ */
+export function testLRUCacheGenerator(
+  prng: () => number,
+): Parameters<typeof testLRUCache> {
+  const cap = Math.floor(prng() * 4) + 1;
+  const opCount = Math.floor(prng() * 10) + 1;
+  const opNames: LRUCacheOp[] = ["put", "get", "has", "remove", "clear"];
+  const keyNames = ["k1", "k2", "k3", "k4"];
+  const ops: [LRUCacheOp, string, number][] = [];
+  for (let i = 0; i < opCount; i++) {
+    const op = opNames[Math.floor(prng() * opNames.length)];
+    const key = keyNames[Math.floor(prng() * keyNames.length)];
+    const val = Math.floor(prng() * 100);
+    ops.push([op, key, val]);
+  }
+  return [cap, ops];
+} // fn: testLRUCacheGenerator
+
+/**
  * Least-Recently-Used (LRU) Key-Value Cache with fixed capacity.
  *
  * When the number of stored entries reaches capacity, adding a new key
@@ -126,108 +229,5 @@ export class LRUCache<K, V> {
     return Array.from(this.cache.keys());
   } // fn: keys
 }
-
-/**
- * Test harness verifying that LRUCache maintains all invariants across
- * a sequence of operations.
- *
- * @param capacity Maximum capacity of the cache
- * @param operations Sequence of [operation, key, value] tuples to execute
- * @returns `true` if all operations and invariants succeed
- */
-export function testLRUCache(
-  capacity: number,
-  operations: [LRUCacheOp, string, number][],
-): boolean {
-  if (capacity <= 0 || capacity > 32 || !Number.isInteger(capacity)) {
-    return true;
-  }
-  const lru = new LRUCache<string, number>(capacity);
-  const shadow = new Map<string, number>();
-
-  for (const [op, key, val] of operations) {
-    if (op === "put") {
-      lru.put(key, val);
-      if (shadow.has(key)) {
-        shadow.delete(key);
-      } else if (shadow.size >= capacity) {
-        const oldest = shadow.keys().next().value;
-        if (oldest !== undefined) {
-          shadow.delete(oldest);
-        }
-      }
-      shadow.set(key, val);
-    } else if (op === "get") {
-      const got = lru.get(key);
-      const expected = shadow.get(key);
-      assert.strictEqual(
-        got,
-        expected,
-        `get(${key}) returned ${got}, expected ${expected}`,
-      );
-      if (expected !== undefined) {
-        shadow.delete(key);
-        shadow.set(key, expected);
-      }
-    } else if (op === "has") {
-      const had = lru.has(key);
-      const expected = shadow.has(key);
-      assert.strictEqual(
-        had,
-        expected,
-        `has(${key}) returned ${had}, expected ${expected}`,
-      );
-    } else if (op === "remove") {
-      const removed = lru.remove(key);
-      const expected = shadow.delete(key);
-      assert.strictEqual(
-        removed,
-        expected,
-        `remove(${key}) returned ${removed}, expected ${expected}`,
-      );
-    } else if (op === "clear") {
-      lru.clear();
-      shadow.clear();
-    }
-
-    assert.strictEqual(
-      lru.size(),
-      shadow.size,
-      `size ${lru.size()} does not match shadow ${shadow.size}`,
-    );
-    assert.strictEqual(
-      lru.isEmpty(),
-      shadow.size === 0,
-      `isEmpty inconsistent with shadow size`,
-    );
-    assert.deepStrictEqual(
-      lru.keys(),
-      Array.from(shadow.keys()),
-      `keys mismatch`,
-    );
-  }
-
-  return true;
-} // fn: testLRUCache
-
-/**
- * User-provided input generator producing realistic LRU cache operation sequences.
- */
-export function testLRUCacheGenerator(
-  prng: () => number,
-): Parameters<typeof testLRUCache> {
-  const cap = Math.floor(prng() * 4) + 1;
-  const opCount = Math.floor(prng() * 10) + 1;
-  const opNames: LRUCacheOp[] = ["put", "get", "has", "remove", "clear"];
-  const keyNames = ["k1", "k2", "k3", "k4"];
-  const ops: [LRUCacheOp, string, number][] = [];
-  for (let i = 0; i < opCount; i++) {
-    const op = opNames[Math.floor(prng() * opNames.length)];
-    const key = keyNames[Math.floor(prng() * keyNames.length)];
-    const val = Math.floor(prng() * 100);
-    ops.push([op, key, val]);
-  }
-  return [cap, ops];
-} // fn: testLRUCacheGenerator
 
 export type LRUCacheOp = "put" | "get" | "has" | "remove" | "clear";

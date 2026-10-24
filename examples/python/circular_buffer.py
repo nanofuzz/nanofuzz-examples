@@ -1,4 +1,99 @@
-from typing import Any, Generic, List, Literal, Optional, Tuple, TypeVar
+from __future__ import annotations
+
+import random
+from typing import Callable, Generic, List, Literal, Optional, Tuple, TypeVar
+
+
+#
+# Test harness verifying that CircularBuffer maintains all invariants across
+# a sequence of operations.
+#
+# @param capacity Maximum capacity of the buffer
+# @param operations Sequence of (operation, value) pairs to execute
+# @returns True if all operations and invariants succeed
+#
+def test_circular_buffer(
+    capacity: int,
+    operations: List[Tuple[Literal["push", "pop", "peek", "clear"], int]],
+) -> bool:
+    """Test harness verifying that CircularBuffer maintains all invariants across operations.
+
+    Args:
+        capacity: Maximum capacity of the circular buffer.
+        operations: Sequence of (operation, value) pairs to execute.
+
+    Returns:
+        True if all operations and invariants succeed.
+    """
+    if capacity <= 0 or capacity > 64:
+        return True
+
+    cb: CircularBuffer[int] = CircularBuffer(capacity)
+    shadow: List[int] = []
+
+    for op, val in operations:
+        if op == "push":
+            added = cb.push(val)
+            if len(shadow) < capacity:
+                assert added, "push failed when capacity was available"
+                shadow.append(val)
+            else:
+                assert not added, "push succeeded when buffer was full"
+        elif op == "pop":
+            popped = cb.pop()
+            if shadow:
+                expected = shadow.pop(0)
+                assert popped == expected, f"pop returned {popped}, expected {expected}"
+            else:
+                assert popped is None, f"pop returned {popped} on empty buffer"
+        elif op == "peek":
+            peeked = cb.peek()
+            expected = shadow[0] if shadow else None
+            assert peeked == expected, f"peek returned {peeked}, expected {expected}"
+        elif op == "clear":
+            cb.clear()
+            shadow.clear()
+
+        assert cb.size() == len(
+            shadow), f"size {cb.size()} does not match shadow {len(shadow)}"
+        assert cb.is_empty() == (len(shadow) == 0), "is_empty inconsistent with shadow length"
+        assert cb.is_full() == (len(shadow) == capacity), "is_full inconsistent with capacity"
+        assert cb.to_list(
+        ) == shadow, f"to_list {cb.to_list()} does not match shadow {shadow}"
+
+    return True
+
+
+#
+# User-provided input generator producing realistic circular buffer operation sequences.
+#
+def test_circular_buffer_generator(
+    prng: Callable[[], float],
+) -> Optional[Tuple[int, List[Tuple[Literal["push", "pop", "peek", "clear"], int]]]]:
+    """User-provided input generator producing realistic circular buffer operation sequences.
+
+    Args:
+        prng: Pseudo-random number generator function returning float values in [0.0, 1.0).
+
+    Returns:
+        A tuple of (capacity, operations) or None when exhausted.
+    """
+    rng = prng if callable(prng) else random.Random(prng).random
+    cap = int(rng() * 8) + 1
+    op_count = int(rng() * 10) + 1
+    op_names: List[Literal["push", "pop", "peek", "clear"]] = [
+        "push",
+        "pop",
+        "peek",
+        "clear",
+    ]
+    ops: List[Tuple[Literal["push", "pop", "peek", "clear"], int]] = []
+    for _ in range(op_count):
+        op = op_names[int(rng() * len(op_names))]
+        val = int(rng() * 100)
+        ops.append((op, val))
+    return (cap, ops)
+
 
 T = TypeVar("T")
 
@@ -100,67 +195,3 @@ class CircularBuffer(Generic[T]):
             if item is not None:
                 result.append(item)
         return result
-
-
-def test_circular_buffer(
-    capacity: int,
-    operations: List[Tuple[Literal["push", "pop", "peek", "clear"], int]],
-) -> bool:
-    """Test harness verifying that CircularBuffer maintains all invariants across operations."""
-    if capacity <= 0 or capacity > 64:
-        return True
-
-    cb: CircularBuffer[int] = CircularBuffer(capacity)
-    shadow: List[int] = []
-
-    for op, val in operations:
-        if op == "push":
-            added = cb.push(val)
-            if len(shadow) < capacity:
-                assert added, "push failed when capacity was available"
-                shadow.append(val)
-            else:
-                assert not added, "push succeeded when buffer was full"
-        elif op == "pop":
-            popped = cb.pop()
-            if shadow:
-                expected = shadow.pop(0)
-                assert popped == expected, f"pop returned {popped}, expected {expected}"
-            else:
-                assert popped is None, f"pop returned {popped} on empty buffer"
-        elif op == "peek":
-            peeked = cb.peek()
-            expected = shadow[0] if shadow else None
-            assert peeked == expected, f"peek returned {peeked}, expected {expected}"
-        elif op == "clear":
-            cb.clear()
-            shadow.clear()
-
-        assert cb.size() == len(
-            shadow), f"size {cb.size()} does not match shadow {len(shadow)}"
-        assert cb.is_empty() == (len(shadow) == 0), "is_empty inconsistent with shadow length"
-        assert cb.is_full() == (len(shadow) == capacity), "is_full inconsistent with capacity"
-        assert cb.to_list(
-        ) == shadow, f"to_list {cb.to_list()} does not match shadow {shadow}"
-
-    return True
-
-
-def test_circular_buffer_generator(
-    prng: Any,
-) -> Optional[Tuple[int, List[Tuple[Literal["push", "pop", "peek", "clear"], int]]]]:
-    """User-provided input generator producing realistic circular buffer operation sequences."""
-    cap = int(prng() * 8) + 1
-    op_count = int(prng() * 10) + 1
-    op_names: List[Literal["push", "pop", "peek", "clear"]] = [
-        "push",
-        "pop",
-        "peek",
-        "clear",
-    ]
-    ops: List[Tuple[Literal["push", "pop", "peek", "clear"], int]] = []
-    for _ in range(op_count):
-        op = op_names[int(prng() * len(op_names))]
-        val = int(prng() * 100)
-        ops.append((op, val))
-    return (cap, ops)

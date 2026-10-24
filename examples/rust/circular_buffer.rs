@@ -1,3 +1,64 @@
+/// Test harness verifying that CircularBuffer maintains all invariants across operations.
+pub fn test_circular_buffer(capacity: usize, operations: Vec<(String, i32)>) -> bool {
+    if capacity == 0 || capacity > 64 {
+        return true;
+    }
+    let mut cb = CircularBuffer::<i32>::new(capacity);
+    let mut shadow: Vec<i32> = Vec::new();
+
+    for (raw_op, val) in operations {
+        let op = raw_op.trim().to_lowercase();
+        if op == "push" || op.starts_with("pu") || op == "+" {
+            let added = cb.push(val);
+            if shadow.len() < capacity {
+                assert!(added, "push failed when capacity was available");
+                shadow.push(val);
+            } else {
+                assert!(!added, "push succeeded when buffer was full");
+            }
+        } else if op == "pop" || op.starts_with("po") || op == "-" {
+            let popped = cb.pop();
+            if !shadow.is_empty() {
+                let expected = shadow.remove(0);
+                assert_eq!(popped, Some(expected), "pop mismatch");
+            } else {
+                assert_eq!(popped, None, "pop on empty buffer");
+            }
+        } else if op == "peek" || op.starts_with("pe") || op == "?" {
+            let peeked = cb.peek().copied();
+            let expected = shadow.first().copied();
+            assert_eq!(peeked, expected, "peek mismatch");
+        } else if op == "clear" || op.starts_with("cl") {
+            cb.clear();
+            shadow.clear();
+        }
+
+        assert_eq!(cb.size(), shadow.len(), "size mismatch");
+        assert_eq!(cb.is_empty(), shadow.is_empty(), "is_empty mismatch");
+        assert_eq!(cb.is_full(), shadow.len() == capacity, "is_full mismatch");
+        assert_eq!(cb.to_vec(), shadow, "to_vec mismatch");
+    }
+
+    true
+} // fn: test_circular_buffer
+
+/// User-provided input generator producing realistic circular buffer operation sequences.
+pub fn test_circular_buffer_generator(
+    mut prng: impl FnMut() -> f64,
+) -> Option<(usize, Vec<(String, i32)>)> {
+    let cap = (prng() * 8.0) as usize + 1;
+    let op_count = (prng() * 10.0) as usize + 1;
+    let op_names = ["push", "pop", "peek", "clear"];
+    let mut ops = Vec::with_capacity(op_count);
+    for _ in 0..op_count {
+        let op_idx = (prng() * op_names.len() as f64) as usize;
+        let op = op_names[op_idx].to_string();
+        let val = (prng() * 100.0) as i32;
+        ops.push((op, val));
+    }
+    Some((cap, ops))
+} // fn: test_circular_buffer_generator
+
 /// Fixed-capacity circular FIFO buffer (ring buffer).
 ///
 /// Allocates a contiguous vector and uses head and tail indices with modulo
@@ -103,64 +164,3 @@ impl<T: Clone> CircularBuffer<T> {
         result
     } // fn: to_vec
 }
-
-/// Test harness verifying that CircularBuffer maintains all invariants across operations.
-pub fn test_circular_buffer(capacity: usize, operations: Vec<(String, i32)>) -> bool {
-    if capacity == 0 || capacity > 64 {
-        return true;
-    }
-    let mut cb = CircularBuffer::<i32>::new(capacity);
-    let mut shadow: Vec<i32> = Vec::new();
-
-    for (raw_op, val) in operations {
-        let op = raw_op.trim().to_lowercase();
-        if op == "push" || op.starts_with("pu") || op == "+" {
-            let added = cb.push(val);
-            if shadow.len() < capacity {
-                assert!(added, "push failed when capacity was available");
-                shadow.push(val);
-            } else {
-                assert!(!added, "push succeeded when buffer was full");
-            }
-        } else if op == "pop" || op.starts_with("po") || op == "-" {
-            let popped = cb.pop();
-            if !shadow.is_empty() {
-                let expected = shadow.remove(0);
-                assert_eq!(popped, Some(expected), "pop mismatch");
-            } else {
-                assert_eq!(popped, None, "pop on empty buffer");
-            }
-        } else if op == "peek" || op.starts_with("pe") || op == "?" {
-            let peeked = cb.peek().copied();
-            let expected = shadow.first().copied();
-            assert_eq!(peeked, expected, "peek mismatch");
-        } else if op == "clear" || op.starts_with("cl") {
-            cb.clear();
-            shadow.clear();
-        }
-
-        assert_eq!(cb.size(), shadow.len(), "size mismatch");
-        assert_eq!(cb.is_empty(), shadow.is_empty(), "is_empty mismatch");
-        assert_eq!(cb.is_full(), shadow.len() == capacity, "is_full mismatch");
-        assert_eq!(cb.to_vec(), shadow, "to_vec mismatch");
-    }
-
-    true
-} // fn: test_circular_buffer
-
-/// User-provided input generator producing realistic circular buffer operation sequences.
-pub fn test_circular_buffer_generator(
-    mut prng: impl FnMut() -> f64,
-) -> Option<(usize, Vec<(String, i32)>)> {
-    let cap = (prng() * 8.0) as usize + 1;
-    let op_count = (prng() * 10.0) as usize + 1;
-    let op_names = ["push", "pop", "peek", "clear"];
-    let mut ops = Vec::with_capacity(op_count);
-    for _ in 0..op_count {
-        let op_idx = (prng() * op_names.len() as f64) as usize;
-        let op = op_names[op_idx].to_string();
-        let val = (prng() * 100.0) as i32;
-        ops.push((op, val));
-    }
-    Some((cap, ops))
-} // fn: test_circular_buffer_generator
