@@ -6,7 +6,7 @@ autoexamples = false
 
 [lib]
 name = "expression_parser"
-path = "examples/rs/lib.rs"
+path = "examples/rust/lib.rs"
 
 [dependencies]
 nanofuzz-runtime = "0.4.0"

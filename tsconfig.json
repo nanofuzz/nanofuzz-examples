@@ -8,7 +8,7 @@
     "sourceMap": true,
     "allowJs": true,
     "moduleResolution": "nodenext",
-    "rootDirs": ["examples", "examples/ts"],
+    "rootDirs": ["examples", "examples/typescript"],
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
@@ -27,7 +27,7 @@
     "declaration": true,
     "declarationMap": true,
     "paths": {
-      "examples/*": ["./examples/*", "./examples/ts/*"]
+      "examples/*": ["./examples/*", "./examples/typescript/*"]
     }
   },
   "formatCodeOptions": {

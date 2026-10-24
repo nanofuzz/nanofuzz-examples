@@ -1,16 +1,16 @@
 import pytest
 from nanofuzz_runtime import UnsatisfiedAssumption
 
-from examples.py.circular_buffer import CircularBuffer
-from examples.py.expression_parser import (
+from examples.python.circular_buffer import CircularBuffer
+from examples.python.expression_parser import (
     evaluate_expression,
     evaluate_expression_transformer,
 )
-from examples.py.lcm import lcm, lcm_validator
-from examples.py.lru_cache import LRUCache
-from examples.py.maxofarray import max_of_array
-from examples.py.min_stack import MinStack
-from examples.py.primefactorize import prime_factorize, prime_factorize_reverse
+from examples.python.lcm import lcm, lcm_validator
+from examples.python.lru_cache import LRUCache
+from examples.python.maxofarray import max_of_array
+from examples.python.min_stack import MinStack
+from examples.python.primefactorize import prime_factorize, prime_factorize_reverse
 
 
 def test_lcm_example() -> None:

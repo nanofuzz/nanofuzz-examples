@@ -17,7 +17,7 @@
     "testEnvironment": "node",
     "modulePaths": [
       "node_modules",
-      "<rootDir>/examples/ts/",
+      "<rootDir>/examples/typescript/",
       "<rootDir>/examples/"
     ],
     "testPathIgnorePatterns": [

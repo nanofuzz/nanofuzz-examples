@@ -6,14 +6,14 @@ A set of buggy example programs for playing with [NaNofuzz](https://github.com/n
 ./
   tutorial/            NaNofuzz tutorial
   examples/
-    ts/                TypeScript NaNofuzz examples
-    py/                Python NaNofuzz examples
-    rs/                Rust NaNofuzz examples
+    typescript/        TypeScript NaNofuzz examples
+    python/            Python NaNofuzz examples
+    rust/              Rust NaNofuzz examples
 ```
 
 Several of the example programs have bugs that may be detected using NaNofuzz' heuristic validator.
 Other examples (e.g., roman, lcm, identitymatrix, modinv, normd) require human or property validators to identify some of the bugs.
-Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/ts/expressionparser.ts`, `examples/py/expression_parser.py`, and `examples/rs/expression_parser.rs`).
+Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/typescript/expressionparser.ts`, `examples/python/expression_parser.py`, and `examples/rust/expression_parser.rs`).
 
 ## Setup
 
