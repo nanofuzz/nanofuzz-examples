@@ -3,6 +3,7 @@
     "firsttris.vscode-jest-runner",
     "ms-python.python",
     "rust-lang.rust-analyzer",
-    "vscjava.vscode-java-pack"
+    "vscjava.vscode-java-pack",
+    "ocamllabs.ocaml-platform"
   ]
 }

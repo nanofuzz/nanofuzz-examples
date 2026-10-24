@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-  "name": "Node.js, Python, Rust & Java",
+  "name": "Node.js, Python, Rust, Java & OCaml",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 
@@ -21,6 +21,10 @@
       "version": "17",
       "installMaven": true,
       "mavenVersion": "3.9.6"
+    },
+    "ghcr.io/devcontainers-extra/features/ocaml-opam:2": {
+      "version": "5.2.0",
+      "packages": "dune,yojson,msgpck,ounit2"
     }
   },
 
@@ -28,7 +32,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test",
+  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && (dune runtest || true)",
 
   // Configure tool-specific properties.
   "customizations": {
@@ -42,7 +46,8 @@
         "firsttris.vscode-jest-runner",
         "ms-python.python",
         "rust-lang.rust-analyzer",
-        "vscjava.vscode-java-pack"
+        "vscjava.vscode-java-pack",
+        "ocamllabs.ocaml-platform"
       ]
     }
   }

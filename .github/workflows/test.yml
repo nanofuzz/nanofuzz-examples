@@ -60,6 +60,23 @@ jobs:
         with:
           maven-version: "3.9.6"
 
+      - name: Install OCaml
+        if: runner.os != 'Windows'
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.2.0
+
+      - name: Install OCaml packages
+        if: runner.os != 'Windows'
+        run: opam install dune yojson msgpck ounit2 -y
+
+      - name: Add OCaml switch to GITHUB_PATH
+        if: runner.os != 'Windows'
+        run: |
+          opam var bin >> "$GITHUB_PATH"
+          echo "OPAM_SWITCH_PREFIX=$(opam var prefix)" >> "$GITHUB_ENV"
+        shell: bash
+
       - name: Install Yarn dependencies
         run: yarn
 
@@ -74,6 +91,10 @@ jobs:
 
       - name: Java tests
         run: mvn test
+
+      - name: OCaml tests
+        if: runner.os != 'Windows'
+        run: dune runtest
 
       - name: CLI smoke tests
         run: yarn test:cli

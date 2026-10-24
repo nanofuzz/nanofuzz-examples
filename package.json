@@ -22,12 +22,16 @@
     ],
     "testPathIgnorePatterns": [
       "build/",
+      "_build/",
       "tests/cli_smoke.test.ts"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/_build/"
     ]
   },
   "scripts": {
     "test": "jest --watchAll=false",
-    "test:cli": "jest tests/cli_smoke.test.ts --testPathIgnorePatterns=build/ --watchAll=false --runInBand",
-    "test:all": "jest --testPathIgnorePatterns=build/ --watchAll=false"
+    "test:cli": "jest tests/cli_smoke.test.ts --testPathIgnorePatterns=build/ --testPathIgnorePatterns=_build/ --watchAll=false --runInBand",
+    "test:all": "jest --testPathIgnorePatterns=build/ --testPathIgnorePatterns=_build/ --watchAll=false"
   }
 }
