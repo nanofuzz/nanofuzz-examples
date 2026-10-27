@@ -32,7 +32,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && (dune runtest || true)",
+  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && dune runtest",
 
   // Configure tool-specific properties.
   "customizations": {
