@@ -75,47 +75,48 @@ let to_list (cb : 'a circular_buffer) : 'a list =
   done;
   !result
 
+type buffer_op = Push | Pop | Peek | Clear
+
 (**
  * Test harness verifying that CircularBuffer maintains all invariants across
  * a sequence of operations.
  *)
-let test_circular_buffer (capacity : int) (operations : (string * int) list) : bool =
+let test_circular_buffer (capacity : int) (operations : (buffer_op * int) list) : bool =
   if capacity <= 0 || capacity > 64 then true
   else begin
     let cb = create capacity in
     let shadow = ref [] in
 
-    List.iter (fun (raw_op, val_) ->
-      let op = String.lowercase_ascii (String.trim raw_op) in
-      if op = "push" || (String.length op >= 2 && String.sub op 0 2 = "pu") || op = "+" then begin
+    List.iter (fun (op, val_) ->
+      match op with
+      | Push ->
         let added = push cb val_ in
         if List.length !shadow < capacity then begin
           assert_true ~message:"push failed when capacity was available" added;
           shadow := !shadow @ [val_]
         end else
           assert_true ~message:"push succeeded when buffer was full" (not added)
-      end else if op = "pop" || (String.length op >= 2 && String.sub op 0 2 = "po") || op = "-" then begin
+      | Pop ->
         let popped = pop cb in
-        match !shadow with
+        (match !shadow with
         | expected :: rest ->
           assert_eq ~message:"pop mismatch" popped (Some expected);
           shadow := rest
         | [] ->
-          assert_eq ~message:"pop on empty buffer" popped None
-      end else if op = "peek" || (String.length op >= 2 && String.sub op 0 2 = "pe") || op = "?" then begin
+          assert_eq ~message:"pop on empty buffer" popped None)
+      | Peek ->
         let peeked = peek cb in
         let expected = match !shadow with x :: _ -> Some x | [] -> None in
         assert_eq ~message:"peek mismatch" peeked expected
-      end else if op = "clear" || (String.length op >= 2 && String.sub op 0 2 = "cl") then begin
+      | Clear ->
         clear cb;
         shadow := []
-      end;
-
-      assert_eq ~message:"size mismatch" (size cb) (List.length !shadow);
-      assert_eq ~message:"is_empty mismatch" (is_empty cb) (!shadow = []);
-      assert_eq ~message:"is_full mismatch" (is_full cb) (List.length !shadow = capacity);
-      assert_eq ~message:"to_list mismatch" (to_list cb) !shadow
     ) operations;
+
+    assert_eq ~message:"size mismatch" (size cb) (List.length !shadow);
+    assert_eq ~message:"is_empty mismatch" (is_empty cb) (!shadow = []);
+    assert_eq ~message:"is_full mismatch" (is_full cb) (List.length !shadow = capacity);
+    assert_eq ~message:"to_list mismatch" (to_list cb) !shadow;
 
     true
   end
@@ -123,12 +124,12 @@ let test_circular_buffer (capacity : int) (operations : (string * int) list) : b
 (**
  * User-provided input generator producing realistic circular buffer operation sequences.
  *)
-let test_circular_buffer_generator (prng : unit -> float) : (int * (string * int) list) option =
+let test_circular_buffer_generator (prng : unit -> float) : (int * (buffer_op * int) list) option =
   let cap = int_of_float (prng () *. 8.0) + 1 in
   let op_count = int_of_float (prng () *. 10.0) + 1 in
-  let op_names = [|"push"; "pop"; "peek"; "clear"|] in
+  let op_variants = [|Push; Pop; Peek; Clear|] in
   let ops = List.init op_count (fun _ ->
-    let op = op_names.(int_of_float (prng () *. 4.0)) in
+    let op = op_variants.(int_of_float (prng () *. 4.0)) in
     let v = int_of_float (prng () *. 100.0) in
     (op, v)
   ) in

@@ -58,19 +58,21 @@ let clear (cache : ('k, 'v) lru_cache) : unit =
 let keys (cache : ('k, 'v) lru_cache) : 'k list =
   List.map fst cache.entries
 
+type cache_op = Put | Get | Has | Remove | Clear
+
 (**
  * Test harness verifying that LRUCache maintains all invariants across
  * a sequence of operations.
  *)
-let test_lru_cache (capacity : int) (operations : (string * string * int) list) : bool =
+let test_lru_cache (capacity : int) (operations : (cache_op * string * int) list) : bool =
   if capacity <= 0 || capacity > 32 then true
   else begin
     let lru = create capacity in
     let shadow = ref [] in
 
-    List.iter (fun (raw_op, key, val_) ->
-      let op = String.lowercase_ascii (String.trim raw_op) in
-      if op = "put" || (String.length op >= 2 && String.sub op 0 2 = "pu") || op = "+" then begin
+    List.iter (fun (op, key, val_) ->
+      match op with
+      | Put ->
         put lru key val_;
         let rest = List.remove_assoc key !shadow in
         let trimmed =
@@ -79,7 +81,7 @@ let test_lru_cache (capacity : int) (operations : (string * string * int) list) 
           else rest
         in
         shadow := trimmed @ [(key, val_)]
-      end else if op = "get" || (String.length op >= 1 && String.sub op 0 1 = "g") || op = "?" then begin
+      | Get ->
         let got = get lru key in
         let expected = List.assoc_opt key !shadow in
         assert_eq ~message:"get mismatch" got expected;
@@ -87,24 +89,23 @@ let test_lru_cache (capacity : int) (operations : (string * string * int) list) 
           let rest = List.remove_assoc key !shadow in
           shadow := rest @ [(key, Option.get expected)]
         end
-      end else if op = "has" || (String.length op >= 1 && String.sub op 0 1 = "h") then begin
+      | Has ->
         let had = has lru key in
         let expected = List.mem_assoc key !shadow in
         assert_eq ~message:"has mismatch" had expected
-      end else if op = "remove" || (String.length op >= 1 && String.sub op 0 1 = "r") || op = "-" then begin
+      | Remove ->
         let removed = remove lru key in
         let expected = List.mem_assoc key !shadow in
         assert_eq ~message:"remove mismatch" removed expected;
         shadow := List.remove_assoc key !shadow
-      end else if op = "clear" || (String.length op >= 2 && String.sub op 0 2 = "cl") then begin
+      | Clear ->
         clear lru;
         shadow := []
-      end;
-
-      assert_eq ~message:"size mismatch" (size lru) (List.length !shadow);
-      assert_eq ~message:"is_empty mismatch" (is_empty lru) (!shadow = []);
-      assert_eq ~message:"keys mismatch" (keys lru) (List.map fst !shadow)
     ) operations;
+
+    assert_eq ~message:"size mismatch" (size lru) (List.length !shadow);
+    assert_eq ~message:"is_empty mismatch" (is_empty lru) (!shadow = []);
+    assert_eq ~message:"keys mismatch" (keys lru) (List.map fst !shadow);
 
     true
   end
@@ -112,13 +113,13 @@ let test_lru_cache (capacity : int) (operations : (string * string * int) list) 
 (**
  * User-provided input generator producing realistic LRU cache operation sequences.
  *)
-let test_lru_cache_generator (prng : unit -> float) : (int * (string * string * int) list) option =
+let test_lru_cache_generator (prng : unit -> float) : (int * (cache_op * string * int) list) option =
   let cap = int_of_float (prng () *. 4.0) + 1 in
   let op_count = int_of_float (prng () *. 10.0) + 1 in
-  let op_names = [|"put"; "get"; "has"; "remove"; "clear"|] in
+  let op_variants = [|Put; Get; Has; Remove; Clear|] in
   let key_names = [|"k1"; "k2"; "k3"; "k4"|] in
   let ops = List.init op_count (fun _ ->
-    let op = op_names.(int_of_float (prng () *. 5.0)) in
+    let op = op_variants.(int_of_float (prng () *. 5.0)) in
     let key = key_names.(int_of_float (prng () *. 4.0)) in
     let val_ = int_of_float (prng () *. 100.0) in
     (op, key, val_)

@@ -55,20 +55,22 @@ let clear (ms : 'a min_stack) : unit =
 let to_list (ms : 'a min_stack) : 'a list =
   List.rev ms.elements
 
+type stack_op = Push | Pop | Top | Min | Clear
+
 (**
  * Test harness verifying that MinStack maintains all invariants across
  * a sequence of operations.
  *)
-let test_min_stack (operations : (string * int) list) : bool =
+let test_min_stack (operations : (stack_op * int) list) : bool =
   let ms = create () in
   let shadow = ref [] in
 
-  List.iter (fun (raw_op, val_) ->
-    let op = String.lowercase_ascii (String.trim raw_op) in
-    if op = "push" || (String.length op >= 2 && String.sub op 0 2 = "pu") || op = "+" then begin
+  List.iter (fun (op, val_) ->
+    match op with
+    | Push ->
       push ms val_;
       shadow := !shadow @ [val_]
-    end else if op = "pop" || (String.length op >= 2 && String.sub op 0 2 = "po") || op = "-" then begin
+    | Pop ->
       let popped = pop ms in
       let expected =
         match List.rev !shadow with
@@ -78,7 +80,7 @@ let test_min_stack (operations : (string * int) list) : bool =
         | [] -> None
       in
       assert_eq ~message:"pop mismatch" popped expected
-    end else if op = "top" || (String.length op >= 1 && String.sub op 0 1 = "t") || op = "?" then begin
+    | Top ->
       let topped = top ms in
       let expected =
         match List.rev !shadow with
@@ -86,7 +88,7 @@ let test_min_stack (operations : (string * int) list) : bool =
         | [] -> None
       in
       assert_eq ~message:"top mismatch" topped expected
-    end else if op = "min" || (String.length op >= 1 && String.sub op 0 1 = "m") then begin
+    | Min ->
       let min_val = get_min ms in
       let expected =
         match !shadow with
@@ -94,32 +96,31 @@ let test_min_stack (operations : (string * int) list) : bool =
         | xs -> Some (List.fold_left min (List.hd xs) (List.tl xs))
       in
       assert_eq ~message:"get_min mismatch" min_val expected
-    end else if op = "clear" || (String.length op >= 2 && String.sub op 0 2 = "cl") then begin
+    | Clear ->
       clear ms;
       shadow := []
-    end;
-
-    assert_eq ~message:"size mismatch" (size ms) (List.length !shadow);
-    assert_eq ~message:"is_empty mismatch" (is_empty ms) (!shadow = []);
-    let current_min = get_min ms in
-    let expected_min =
-      match !shadow with
-      | [] -> None
-      | xs -> Some (List.fold_left min (List.hd xs) (List.tl xs))
-    in
-    assert_eq ~message:"invariant get_min mismatch" current_min expected_min
   ) operations;
+
+  assert_eq ~message:"size mismatch" (size ms) (List.length !shadow);
+  assert_eq ~message:"is_empty mismatch" (is_empty ms) (!shadow = []);
+  let current_min = get_min ms in
+  let expected_min =
+    match !shadow with
+    | [] -> None
+    | xs -> Some (List.fold_left min (List.hd xs) (List.tl xs))
+  in
+  assert_eq ~message:"invariant get_min mismatch" current_min expected_min;
 
   true
 
 (**
  * User-provided input generator producing realistic MinStack operation sequences.
  *)
-let test_min_stack_generator (prng : unit -> float) : ((string * int) list) option =
+let test_min_stack_generator (prng : unit -> float) : ((stack_op * int) list) option =
   let op_count = int_of_float (prng () *. 10.0) + 1 in
-  let op_names = [|"push"; "pop"; "top"; "min"; "clear"|] in
+  let op_variants = [|Push; Pop; Top; Min; Clear|] in
   let ops = List.init op_count (fun _ ->
-    let op = op_names.(int_of_float (prng () *. 5.0)) in
+    let op = op_variants.(int_of_float (prng () *. 5.0)) in
     let v = int_of_float (prng () *. 200.0) - 100 in
     (op, v)
   ) in
