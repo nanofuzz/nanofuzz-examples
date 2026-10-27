@@ -92,7 +92,7 @@ jobs:
         run: cargo test
 
       - name: Java tests
-        run: mvn test
+        run: mvn test dependency:copy-dependencies -DincludeScope=test
 
       - name: OCaml tests
         if: runner.os != 'Windows'
