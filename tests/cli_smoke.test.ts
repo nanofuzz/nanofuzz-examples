@@ -27,7 +27,9 @@ const TS_TARGETS = [
 const PY_TARGETS = [
   "examples/python/circular_buffer.py::test_circular_buffer",
   "examples/python/expression_parser.py::evaluate_expression",
+  "examples/python/identity_matrix.py::identity",
   "examples/python/lcm.py::lcm",
+  "examples/python/levenshtein.py::levenshtein",
   "examples/python/lru_cache.py::test_lru_cache",
   "examples/python/maxofarray.py::max_of_array",
   "examples/python/min_stack.py::test_min_stack",
@@ -37,8 +39,28 @@ const PY_TARGETS = [
 const RS_TARGETS = [
   "examples/rust/circular_buffer.rs::test_circular_buffer",
   "examples/rust/expression_parser.rs::evaluate_expression",
+  "examples/rust/identity_matrix.rs::identity",
+  "examples/rust/levenshtein.rs::levenshtein",
   "examples/rust/lru_cache.rs::test_lru_cache",
   "examples/rust/min_stack.rs::test_min_stack",
+];
+
+const OXCAML_TARGETS = [
+  "examples/oxcaml/circular_buffer.ml::test_circular_buffer",
+  "examples/oxcaml/expression_parser.ml::evaluate_expression",
+  "examples/oxcaml/identity_matrix.ml::identity",
+  "examples/oxcaml/levenshtein.ml::levenshtein",
+  "examples/oxcaml/lru_cache.ml::test_lru_cache",
+  "examples/oxcaml/min_stack.ml::test_min_stack",
+];
+
+const JAVA_TARGETS = [
+  "examples/java/CircularBuffer.java::testCircularBuffer",
+  "examples/java/ExpressionParser.java::evaluateExpression",
+  "examples/java/IdentityMatrix.java::identity",
+  "examples/java/Levenshtein.java::levenshtein",
+  "examples/java/LRUCache.java::testLRUCache",
+  "examples/java/MinStack.java::testMinStack",
 ];
 
 const TUTORIAL_TARGETS = ["tutorial/tutorial.ts::findMedianSortedArrays"];
@@ -62,6 +84,22 @@ describe("NaNofuzz CLI smoke tests", () => {
     it.each(RS_TARGETS)("tests %s", (target) => {
       runAndAssertTarget(target);
     });
+  });
+
+  describe("Java examples", () => {
+    it.each(JAVA_TARGETS)("tests %s", (target) => {
+      runAndAssertTarget(target);
+    });
+  });
+
+  describe("OxCaml examples", () => {
+    const isWindows = process.platform === "win32";
+    (isWindows ? it.skip.each : it.each)(OXCAML_TARGETS)(
+      "tests %s",
+      (target) => {
+        runAndAssertTarget(target);
+      },
+    );
   });
 
   describe("Tutorial examples", () => {

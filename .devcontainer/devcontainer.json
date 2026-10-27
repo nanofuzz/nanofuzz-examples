@@ -32,7 +32,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && dune runtest",
+  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && opam pin add nanofuzz_runtime https://github.com/nanofuzz/nanofuzz/releases/download/v0.4.1/nanofuzz_runtime-0.4.1.tar.gz -y && dune runtest",
 
   // Configure tool-specific properties.
   "customizations": {

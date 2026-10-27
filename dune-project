@@ -9,4 +9,5 @@
   (dune (>= 2.9.0))
   (yojson (>= 1.6.0))
   (msgpck (>= 1.7))
+  (nanofuzz_runtime (>= 0.4.1))
   (ounit2 :with-test)))

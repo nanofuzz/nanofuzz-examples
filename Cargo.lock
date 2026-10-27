@@ -16,7 +16,7 @@ checksum = "cf8baf1c55e62ffcace7a9f06f4bd9cd3f0c4beb022d3b367256b91b87513d98"
 
 [[package]]
 name = "nanofuzz-examples"
-version = "0.4.0"
+version = "0.4.1"
 dependencies = [
  "nanofuzz-runtime",
  "serde",
@@ -25,9 +25,9 @@ dependencies = [
 
 [[package]]
 name = "nanofuzz-runtime"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bb1bf0c5bc94d5091e77c4cd7430a132028b0b7718c4952d2e24f86edb8126e5"
+checksum = "722f7c3b6a253a66a42cb862d7dc675e129978a8badd12a7db465c9da928acd3"
 dependencies = [
  "serde",
  "serde_json",

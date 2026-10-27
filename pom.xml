@@ -6,7 +6,7 @@
 
     <groupId>com.nanofuzz</groupId>
     <artifactId>nanofuzz-examples</artifactId>
-    <version>0.4.0</version>
+    <version>0.4.1</version>
     <packaging>jar</packaging>
 
     <name>nanofuzz-examples</name>
@@ -19,23 +19,11 @@
         <junit.jupiter.version>5.10.2</junit.jupiter.version>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>project-local-repo</id>
-            <url>file://${project.basedir}/lib/repository</url>
-        </repository>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/nanofuzz/nanofuzz</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
-            <groupId>com.nanofuzz</groupId>
+            <groupId>io.github.nanofuzz</groupId>
             <artifactId>nanofuzz-runtime</artifactId>
-            <version>0.4.0</version>
+            <version>0.4.1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

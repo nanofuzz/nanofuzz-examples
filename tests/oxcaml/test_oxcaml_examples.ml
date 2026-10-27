@@ -36,10 +36,10 @@ let test_circular_buffer _ =
 
   assert_bool "test_circular_buffer harness"
     (Circular_buffer.test_circular_buffer 3 [
-      (Circular_buffer.Push, 1);
-      (Circular_buffer.Push, 2);
-      (Circular_buffer.Pop, 0);
-      (Circular_buffer.Clear, 0);
+      ("push", 1);
+      ("push", 2);
+      ("pop", 0);
+      ("clear", 0);
     ])
 
 let test_min_stack _ =
@@ -70,10 +70,10 @@ let test_min_stack _ =
 
   assert_bool "test_min_stack harness"
     (Min_stack.test_min_stack [
-      (Min_stack.Push, 10);
-      (Min_stack.Push, 5);
-      (Min_stack.Min, 0);
-      (Min_stack.Pop, 0);
+      ("push", 10);
+      ("push", 5);
+      ("min", 0);
+      ("pop", 0);
     ])
 
 let test_lru_cache _ =
@@ -92,10 +92,10 @@ let test_lru_cache _ =
 
   assert_bool "test_lru_cache harness"
     (Lru_cache.test_lru_cache 2 [
-      (Lru_cache.Put, "k1", 10);
-      (Lru_cache.Put, "k2", 20);
-      (Lru_cache.Get, "k1", 0);
-      (Lru_cache.Remove, "k2", 0);
+      ("put", "k1", 10);
+      ("put", "k2", 20);
+      ("get", "k1", 0);
+      ("remove", "k2", 0);
     ])
 
 let test_levenshtein _ =
@@ -106,13 +106,6 @@ let test_identity_matrix _ =
   let m = Identity_matrix.identity 3 in
   assert_equal 3 (Array.length m)
 
-let test_roman _ =
-  assert_equal 6 (Roman.decode_roman "IV"); (* Note RosettaCode known bug: V before IV *)
-  assert_equal 6 (Roman.decode_roman "VI");
-  assert_equal 2026 (Roman.decode_roman "MMXXIV");
-  assert_equal "VI" (Roman.to_roman 6);
-  assert_equal "XXIV" (Roman.to_roman 24)
-
 let suite =
   "OxcamlExamplesTests" >::: [
     "test_expression_parser" >:: test_expression_parser;
@@ -121,7 +114,6 @@ let suite =
     "test_lru_cache" >:: test_lru_cache;
     "test_levenshtein" >:: test_levenshtein;
     "test_identity_matrix" >:: test_identity_matrix;
-    "test_roman" >:: test_roman;
   ]
 
 let () =

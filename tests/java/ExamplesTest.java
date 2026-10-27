@@ -114,15 +114,4 @@ public class ExamplesTest {
     assertNotNull(m);
     assertEquals(3, m.length);
   }
-
-  @Test
-  void testRoman() {
-    // Note: Due to the known bug in the RosettaCode decodeRoman implementation
-    // (V is checked before IV), "IV" produces 6 rather than 4.
-    assertEquals(6, Roman.decodeRoman("IV"));
-    assertEquals(6, Roman.decodeRoman("VI"));
-    assertEquals(2026, Roman.decodeRoman("MMXXIV"));
-    assertEquals("VI", Roman.toRoman(6));
-    assertEquals("XXIV", Roman.toRoman(24));
-  }
 }

@@ -68,7 +68,9 @@ jobs:
 
       - name: Install OCaml packages
         if: runner.os != 'Windows'
-        run: opam install dune yojson msgpck ounit2 -y
+        run: |
+          opam install dune yojson msgpck ounit2 -y
+          opam pin add nanofuzz_runtime https://github.com/nanofuzz/nanofuzz/releases/download/v0.4.1/nanofuzz_runtime-0.4.1.tar.gz -y
 
       - name: Add OCaml switch to GITHUB_PATH
         if: runner.os != 'Windows'

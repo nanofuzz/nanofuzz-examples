@@ -6,16 +6,16 @@ open Nanofuzz_runtime
  * When the number of stored entries reaches capacity, adding a new key
  * evicts the least recently accessed (retrieved or inserted) entry.
  *)
-type ('k, 'v) lru_cache = {
-  mutable entries : ('k * 'v) list;
+type lru_cache = {
+  mutable entries : (string * int) list;
   cap : int;
 }
 
-let create (capacity : int) : ('k, 'v) lru_cache =
+let create (capacity : int) : lru_cache =
   assert_true ~message:"Capacity must be a positive integer" (capacity > 0);
   { entries = []; cap = capacity }
 
-let get (cache : ('k, 'v) lru_cache) (key : 'k) : 'v option =
+let get (cache : lru_cache) (key : string) : int option =
   match List.assoc_opt key cache.entries with
   | Some v ->
     let rest = List.remove_assoc key cache.entries in
@@ -23,7 +23,7 @@ let get (cache : ('k, 'v) lru_cache) (key : 'k) : 'v option =
     Some v
   | None -> None
 
-let put (cache : ('k, 'v) lru_cache) (key : 'k) (value : 'v) : unit =
+let put (cache : lru_cache) (key : string) (value : int) : unit =
   let rest = List.remove_assoc key cache.entries in
   let trimmed =
     if List.length rest >= cache.cap then
@@ -33,46 +33,44 @@ let put (cache : ('k, 'v) lru_cache) (key : 'k) (value : 'v) : unit =
   in
   cache.entries <- trimmed @ [(key, value)]
 
-let has (cache : ('k, 'v) lru_cache) (key : 'k) : bool =
+let has (cache : lru_cache) (key : string) : bool =
   List.mem_assoc key cache.entries
 
-let remove (cache : ('k, 'v) lru_cache) (key : 'k) : bool =
+let remove (cache : lru_cache) (key : string) : bool =
   if List.mem_assoc key cache.entries then begin
     cache.entries <- List.remove_assoc key cache.entries;
     true
   end else
     false
 
-let size (cache : ('k, 'v) lru_cache) : int =
+let size (cache : lru_cache) : int =
   List.length cache.entries
 
-let capacity (cache : ('k, 'v) lru_cache) : int =
+let capacity (cache : lru_cache) : int =
   cache.cap
 
-let is_empty (cache : ('k, 'v) lru_cache) : bool =
+let is_empty (cache : lru_cache) : bool =
   cache.entries = []
 
-let clear (cache : ('k, 'v) lru_cache) : unit =
+let clear (cache : lru_cache) : unit =
   cache.entries <- []
 
-let keys (cache : ('k, 'v) lru_cache) : 'k list =
+let keys (cache : lru_cache) : string list =
   List.map fst cache.entries
-
-type cache_op = Put | Get | Has | Remove | Clear
 
 (**
  * Test harness verifying that LRUCache maintains all invariants across
  * a sequence of operations.
  *)
-let test_lru_cache (capacity : int) (operations : (cache_op * string * int) list) : bool =
+let test_lru_cache (capacity : int) (operations : (string * string * int) list) : bool =
   if capacity <= 0 || capacity > 32 then true
   else begin
     let lru = create capacity in
     let shadow = ref [] in
 
-    List.iter (fun (op, key, val_) ->
-      match op with
-      | Put ->
+    List.iter (fun (raw_op, key, val_) ->
+      let op = String.lowercase_ascii (String.trim raw_op) in
+      if op = "put" || op = "+" then begin
         put lru key val_;
         let rest = List.remove_assoc key !shadow in
         let trimmed =
@@ -81,7 +79,7 @@ let test_lru_cache (capacity : int) (operations : (cache_op * string * int) list
           else rest
         in
         shadow := trimmed @ [(key, val_)]
-      | Get ->
+      end else if op = "get" || op = "?" then begin
         let got = get lru key in
         let expected = List.assoc_opt key !shadow in
         assert_eq ~message:"get mismatch" got expected;
@@ -89,18 +87,19 @@ let test_lru_cache (capacity : int) (operations : (cache_op * string * int) list
           let rest = List.remove_assoc key !shadow in
           shadow := rest @ [(key, Option.get expected)]
         end
-      | Has ->
+      end else if op = "has" then begin
         let had = has lru key in
         let expected = List.mem_assoc key !shadow in
         assert_eq ~message:"has mismatch" had expected
-      | Remove ->
+      end else if op = "remove" || op = "-" then begin
         let removed = remove lru key in
         let expected = List.mem_assoc key !shadow in
         assert_eq ~message:"remove mismatch" removed expected;
         shadow := List.remove_assoc key !shadow
-      | Clear ->
+      end else if op = "clear" then begin
         clear lru;
         shadow := []
+      end
     ) operations;
 
     assert_eq ~message:"size mismatch" (size lru) (List.length !shadow);
@@ -113,13 +112,13 @@ let test_lru_cache (capacity : int) (operations : (cache_op * string * int) list
 (**
  * User-provided input generator producing realistic LRU cache operation sequences.
  *)
-let test_lru_cache_generator (prng : unit -> float) : (int * (cache_op * string * int) list) option =
+let test_lru_cache_generator (prng : unit -> float) : (int * (string * string * int) list) option =
   let cap = int_of_float (prng () *. 4.0) + 1 in
   let op_count = int_of_float (prng () *. 10.0) + 1 in
-  let op_variants = [|Put; Get; Has; Remove; Clear|] in
+  let op_names = [|"put"; "get"; "has"; "remove"; "clear"|] in
   let key_names = [|"k1"; "k2"; "k3"; "k4"|] in
   let ops = List.init op_count (fun _ ->
-    let op = op_variants.(int_of_float (prng () *. 5.0)) in
+    let op = op_names.(int_of_float (prng () *. 5.0)) in
     let key = key_names.(int_of_float (prng () *. 4.0)) in
     let val_ = int_of_float (prng () *. 100.0) in
     (op, key, val_)

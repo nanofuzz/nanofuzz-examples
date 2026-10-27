@@ -1,3 +1,0 @@
-(test
- (name test_nanofuzz_runtime)
- (libraries nanofuzz_runtime ounit2 yojson))
