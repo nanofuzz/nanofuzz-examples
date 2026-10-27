@@ -48,6 +48,37 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "maven"
+
+      - name: Setup Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: "3.9.6"
+
+      - name: Install OCaml
+        if: runner.os != 'Windows'
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.2.0
+
+      - name: Install OCaml packages
+        if: runner.os != 'Windows'
+        run: |
+          opam install dune yojson msgpck ounit2 -y
+          opam pin add nanofuzz_runtime https://github.com/nanofuzz/nanofuzz/releases/download/v0.4.1/nanofuzz_runtime-0.4.1.tar.gz -y
+
+      - name: Add OCaml switch to GITHUB_PATH
+        if: runner.os != 'Windows'
+        run: |
+          opam var bin >> "$GITHUB_PATH"
+          echo "OPAM_SWITCH_PREFIX=$(opam var prefix)" >> "$GITHUB_ENV"
+        shell: bash
+
       - name: Install Yarn dependencies
         run: yarn
 
@@ -59,6 +90,13 @@ jobs:
 
       - name: Rust tests
         run: cargo test
+
+      - name: Java tests
+        run: mvn test dependency:copy-dependencies -DincludeScope=test
+
+      - name: OCaml tests
+        if: runner.os != 'Windows'
+        run: dune runtest
 
       - name: CLI smoke tests
         run: yarn test:cli

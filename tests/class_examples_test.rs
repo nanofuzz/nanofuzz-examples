@@ -1,4 +1,4 @@
-use expression_parser::{CircularBuffer, LRUCache, MinStack};
+use expression_parser::{identity, levenshtein, CircularBuffer, LRUCache, MinStack};
 
 #[test]
 fn test_circular_buffer() {
@@ -64,3 +64,15 @@ fn test_lru_cache() {
     assert!(lru.remove(&"c".to_string()));
     assert_eq!(lru.size(), 1);
 } // fn: test_lru_cache
+
+#[test]
+fn test_identity_matrix() {
+    let m = identity(3);
+    assert_eq!(m.len(), 3);
+} // fn: test_identity_matrix
+
+#[test]
+fn test_levenshtein() {
+    assert_eq!(levenshtein("kitten".to_string(), "sitting".to_string()), 3);
+    assert_eq!(levenshtein("hello".to_string(), "hello".to_string()), 0);
+} // fn: test_levenshtein

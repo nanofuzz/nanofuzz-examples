@@ -145,24 +145,24 @@ fn tokenize_safe(input: &str) -> Option<Vec<String>> {
     Some(tokens)
 } // fn: tokenize_safe
 
-struct Parser<'a> {
-    tokens: &'a [String],
+struct Parser {
+    tokens: Vec<String>,
     pos: usize,
 }
 
-impl<'a> Parser<'a> {
-    fn new(tokens: &'a [String]) -> Self {
-        Self { tokens, pos: 0 }
+impl Parser {
+    fn new(tokens: &[String]) -> Self {
+        Self { tokens: tokens.to_vec(), pos: 0 }
     } // fn: new
 
-    fn peek(&self) -> Option<&'a str> {
+    fn peek(&self) -> Option<&str> {
         self.tokens.get(self.pos).map(|s| s.as_str())
     } // fn: peek
 
-    fn consume(&mut self) -> &'a str {
-        let token = &self.tokens[self.pos];
+    fn consume(&mut self) -> String {
+        let token = self.tokens[self.pos].clone();
         self.pos += 1;
-        token.as_str()
+        token
     } // fn: consume
 
     fn parse_factor(&mut self) -> f64 {

@@ -6,7 +6,9 @@ from examples.python.expression_parser import (
     evaluate_expression,
     evaluate_expression_transformer,
 )
+from examples.python.identity_matrix import identity
 from examples.python.lcm import lcm, lcm_validator
+from examples.python.levenshtein import levenshtein
 from examples.python.lru_cache import LRUCache
 from examples.python.maxofarray import max_of_array
 from examples.python.min_stack import MinStack
@@ -113,3 +115,13 @@ def test_lru_cache_example() -> None:
     assert lru.keys() == ["c", "a"]
     assert lru.remove("c") is True
     assert lru.size() == 1
+
+
+def test_identity_matrix_example() -> None:
+    m = identity(3)
+    assert len(m) == 3
+
+
+def test_levenshtein_example() -> None:
+    assert levenshtein("kitten", "sitting") == 3
+    assert levenshtein("hello", "hello") == 0

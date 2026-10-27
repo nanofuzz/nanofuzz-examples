@@ -9,5 +9,9 @@
   "python.terminal.activateEnvironment": true,
   // Hide NaNofuzz button on validator functions
   "nanofuzz.ui.codeLens.includeValidators": false,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "[java]": {
+    "editor.defaultFormatter": "redhat.java"
+  },
+  "java.project.resourceFilters": ["node_modules", "\\.git", "target"]
 }

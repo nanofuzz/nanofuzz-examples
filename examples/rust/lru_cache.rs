@@ -80,7 +80,7 @@ pub fn test_lru_cache_generator(
 /// When the cache is full, inserting a new key evicts the least recently
 /// accessed entry. Retrieving or updating a key updates its recency.
 #[derive(Debug, Clone)]
-pub struct LRUCache<K, V> {
+pub struct LRUCache<K: Hash + Eq, V> {
     cache: HashMap<K, V>,
     order: Vec<K>,
     cap: usize,
@@ -175,4 +175,3 @@ impl<K: Hash + Eq + Clone, V: Clone> LRUCache<K, V> {
         self.order.clone()
     } // fn: keys
 }
-

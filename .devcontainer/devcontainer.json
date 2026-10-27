@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-  "name": "Node.js, Python & Rust",
+  "name": "Node.js, Python, Rust, Java & OCaml",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 
@@ -16,6 +16,15 @@
     "ghcr.io/devcontainers/features/rust:1": {
       "version": "latest",
       "profile": "default"
+    },
+    "ghcr.io/devcontainers/features/java:1": {
+      "version": "17",
+      "installMaven": true,
+      "mavenVersion": "3.9.6"
+    },
+    "ghcr.io/devcontainers-extra/features/ocaml-opam:2": {
+      "version": "5.2.0",
+      "packages": "dune,yojson,msgpck,ounit2"
     }
   },
 
@@ -23,15 +32,22 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build",
+  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && opam pin add nanofuzz_runtime https://github.com/nanofuzz/nanofuzz/releases/download/v0.4.1/nanofuzz_runtime-0.4.1.tar.gz -y && dune runtest",
 
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
+      "settings": {
+        "[java]": {
+          "editor.defaultFormatter": "redhat.java"
+        }
+      },
       "extensions": [
         "firsttris.vscode-jest-runner",
         "ms-python.python",
-        "rust-lang.rust-analyzer"
+        "rust-lang.rust-analyzer",
+        "vscjava.vscode-java-pack",
+        "ocamllabs.ocaml-platform"
       ]
     }
   }
