@@ -11,17 +11,18 @@ A set of buggy example programs for playing with [NaNofuzz](https://github.com/n
     rust/              Rust NaNofuzz examples
     java/              Java NaNofuzz examples
     oxcaml/            OCaml / OxCaml NaNofuzz examples
+    go/                Go NaNofuzz examples
 ```
 
 Several of the example programs have bugs that may be detected using NaNofuzz' heuristic validator.
 Other examples (e.g., roman, lcm, identitymatrix, modinv, normd) require human or property validators to identify some of the bugs.
-Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/typescript/expressionparser.ts`, `examples/python/expression_parser.py`, `examples/rust/expression_parser.rs`, `examples/java/ExpressionParser.java`, and `examples/oxcaml/expression_parser.ml`).
+Input transformers with `assume()` and custom input generators are demonstrated in the expression parser examples (`examples/typescript/expressionparser.ts`, `examples/python/expression_parser.py`, `examples/rust/expression_parser.rs`, `examples/java/ExpressionParser.java`, `examples/oxcaml/expression_parser.ml`, and `examples/go/expression_parser.go`).
 
 ## Setup
 
-The Codespace installs the Node.js, Python, Rust, Java, and OCaml dependencies automatically. For a
+The Codespace installs the Node.js, Python, Rust, Java, OCaml, and Go dependencies automatically. For a
 local checkout, install the TypeScript dependencies, create the Python
-virtual environment, build the Rust crate, compile Java, and build OCaml:
+virtual environment, build the Rust crate, compile Java, build OCaml, and build Go:
 
 ```sh
 yarn install
@@ -29,6 +30,7 @@ python -m venv .venv
 cargo build
 mvn compile
 dune build
+go build ./...
 ```
 
 On Linux or macOS:
@@ -50,3 +52,5 @@ On Windows:
 - **Rust**: `cargo test`
 - **Java**: `mvn test`
 - **OCaml / OxCaml**: `dune runtest`
+- **Go**: `go test ./tests/go/...`
+- **CLI Smoke Tests (all languages)**: `yarn test:cli`

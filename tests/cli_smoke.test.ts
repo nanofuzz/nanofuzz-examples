@@ -63,6 +63,15 @@ const JAVA_TARGETS = [
   "examples/java/MinStack.java::testMinStack",
 ];
 
+const GO_TARGETS = [
+  "examples/go/circular_buffer.go::TestCircularBuffer",
+  "examples/go/expression_parser.go::EvaluateExpression",
+  "examples/go/identity_matrix.go::Identity",
+  "examples/go/levenshtein.go::Levenshtein",
+  "examples/go/lru_cache.go::TestLRUCache",
+  "examples/go/min_stack.go::TestMinStack",
+];
+
 const TUTORIAL_TARGETS = ["tutorial/tutorial.ts::findMedianSortedArrays"];
 
 describe("NaNofuzz CLI smoke tests", () => {
@@ -100,6 +109,12 @@ describe("NaNofuzz CLI smoke tests", () => {
         runAndAssertTarget(target);
       },
     );
+  });
+
+  describe("Go examples", () => {
+    it.each(GO_TARGETS)("tests %s", (target) => {
+      runAndAssertTarget(target);
+    });
   });
 
   describe("Tutorial examples", () => {
