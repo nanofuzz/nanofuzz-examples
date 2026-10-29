@@ -1,7 +1,12 @@
-// Adapted from RosettaCode Identity matrix
+// Adapted from RosettaCode: https://rosettacode.org/wiki/Identity_matrix
 //
-// Returns an n x n identity matrix where diagonal elements are 1 and others are 0.
-
+// This function constructs an n x n identity matrix where:
+//   n = 1 => [[1]]
+//   n = 2 => [[1, 0], [0, 1]]
+//   n = 3 => [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+//
+// @param n dimension of the identity matrix (must be >= 1)
+// @return a 2D integer array representing the n x n identity matrix
 def identity(n: int) -> Array<Array<int>> {
     var matrix = Array<Array<int>>.new(n);
     for (i = 0; i < n; i++) {
@@ -12,6 +17,11 @@ def identity(n: int) -> Array<Array<int>> {
     return matrix;
 }
 
+// Input transformer constraining matrix dimensions to valid range [1, 100].
+// Filters out invalid or excessively large inputs via assume().
+//
+// @param n raw generated matrix dimension
+// @return validated matrix dimension
 def identityTransformer(n: int) -> int {
     if (n < 1 || n > 100) {
         NanofuzzRuntime.assume(false, "n must be between 1 and 100");
@@ -19,6 +29,10 @@ def identityTransformer(n: int) -> int {
     return n;
 }
 
+// Property validator verifying that identity matrix outputs are non-empty and well-formed.
+//
+// @param r single fuzz execution result
+// @return true if output satisfies property invariants, false otherwise
 def identityValidator(r: FuzzTestResult) -> bool {
     var outStr = r.get_out_string();
     return outStr.length > 0;

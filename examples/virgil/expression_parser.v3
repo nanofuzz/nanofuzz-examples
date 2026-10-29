@@ -1,19 +1,10 @@
 // Arithmetic expression evaluator in Virgil
-
-def is_digit(c: byte) -> bool {
-    return c >= '0' && c <= '9';
-}
-
-def parse_int(s: string, start: int) -> (int, int) {
-    var val = 0;
-    var i = start;
-    while (i < s.length && is_digit(s[i])) {
-        val = val * 10 + (s[i] - '0');
-        i++;
-    }
-    return (val, i);
-}
-
+//
+// Evaluates simple arithmetic expressions supporting +, -, *, and / operations.
+// Processes numbers and binary operators sequentially.
+//
+// @param expr the input arithmetic expression string (e.g. "12+34*2")
+// @return the integer evaluation result
 def evaluate_expression(expr: string) -> int {
     if (expr.length == 0) return 0;
     var i = 0;
@@ -38,4 +29,27 @@ def evaluate_expression(expr: string) -> int {
     }
 
     return val;
+}
+
+// Parses a consecutive sequence of ASCII decimal digits into an integer.
+//
+// @param s input string containing digits
+// @param start starting character offset in s
+// @return tuple of (parsed integer value, next unparsed character offset)
+def parse_int(s: string, start: int) -> (int, int) {
+    var val = 0;
+    var i = start;
+    while (i < s.length && is_digit(s[i])) {
+        val = val * 10 + (s[i] - '0');
+        i++;
+    }
+    return (val, i);
+}
+
+// Checks whether an ASCII character byte is a decimal digit ('0' through '9').
+//
+// @param c character byte to inspect
+// @return true if c is in ['0', '9'], false otherwise
+def is_digit(c: byte) -> bool {
+    return c >= '0' && c <= '9';
 }
