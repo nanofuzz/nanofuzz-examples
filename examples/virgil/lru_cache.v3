@@ -1,0 +1,79 @@
+// LRU Cache implementation in Virgil
+
+class LruCache {
+    var keys: Array<int>;
+    var values: Array<int>;
+    var count: int;
+    var capacity: int;
+
+    new(capacity: int) {
+        this.capacity = capacity;
+        this.keys = Array<int>.new(capacity);
+        this.values = Array<int>.new(capacity);
+        this.count = 0;
+    }
+
+    def get(key: int) -> int {
+        for (i = 0; i < count; i++) {
+            if (keys[i] == key) {
+                var v = values[i];
+                // Move to front
+                for (j = i; j > 0; j--) {
+                    keys[j] = keys[j - 1];
+                    values[j] = values[j - 1];
+                }
+                keys[0] = key;
+                values[0] = v;
+                return v;
+            }
+        }
+        return -1;
+    }
+
+    def put(key: int, value: int) {
+        for (i = 0; i < count; i++) {
+            if (keys[i] == key) {
+                values[i] = value;
+                get(key);
+                return;
+            }
+        }
+
+        if (count < capacity) {
+            for (j = count; j > 0; j--) {
+                keys[j] = keys[j - 1];
+                values[j] = values[j - 1];
+            }
+            keys[0] = key;
+            values[0] = value;
+            count++;
+        } else if (capacity > 0) {
+            // Evict oldest (last)
+            for (j = capacity - 1; j > 0; j--) {
+                keys[j] = keys[j - 1];
+                values[j] = values[j - 1];
+            }
+            keys[0] = key;
+            values[0] = value;
+        }
+    }
+}
+
+def test_lru_cache(capacity: int, operations: Array<(string, int, int)>) -> bool {
+    if (capacity <= 0 || capacity > 32) return true;
+    var cache = LruCache.new(capacity);
+
+    for (i = 0; i < operations.length; i++) {
+        var op = operations[i].0;
+        var k = operations[i].1;
+        var v = operations[i].2;
+
+        if (op == "put") {
+            cache.put(k, v);
+        } else if (op == "get") {
+            cache.get(k);
+        }
+    }
+
+    return true;
+}

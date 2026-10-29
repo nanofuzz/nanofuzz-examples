@@ -11,6 +11,7 @@ A set of buggy example programs for playing with [NaNofuzz](https://github.com/n
     rust/              Rust NaNofuzz examples
     java/              Java NaNofuzz examples
     oxcaml/            OCaml / OxCaml NaNofuzz examples
+    virgil/            Virgil NaNofuzz examples
 ```
 
 Several of the example programs have bugs that may be detected using NaNofuzz' heuristic validator.

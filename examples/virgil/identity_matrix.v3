@@ -1,0 +1,25 @@
+// Adapted from RosettaCode Identity matrix
+//
+// Returns an n x n identity matrix where diagonal elements are 1 and others are 0.
+
+def identity(n: int) -> Array<Array<int>> {
+    var matrix = Array<Array<int>>.new(n);
+    for (i = 0; i < n; i++) {
+        var row = Array<int>.new(n);
+        row[i] = 1;
+        matrix[i] = row;
+    }
+    return matrix;
+}
+
+def identityTransformer(n: int) -> int {
+    if (n < 1 || n > 100) {
+        NanofuzzRuntime.assume(false, "n must be between 1 and 100");
+    }
+    return n;
+}
+
+def identityValidator(r: FuzzTestResult) -> bool {
+    var outStr = r.get_out_string();
+    return outStr.length > 0;
+}

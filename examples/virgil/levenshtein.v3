@@ -1,0 +1,39 @@
+// Adapted from RosettaCode Levenshtein distance
+//
+// The Levenshtein distance is a metric for measuring the difference
+// between two sequences (edit distance).
+
+def min3(a: int, b: int, c: int) -> int {
+    var m = a;
+    if (b < m) m = b;
+    if (c < m) m = c;
+    return m;
+}
+
+def levenshtein(a: string, b: string) -> int {
+    var m = a.length;
+    var n = b.length;
+
+    var t = Array<int>.new(n + 1);
+    for (j = 0; j <= n; j++) {
+        t[j] = j;
+    }
+
+    var u = Array<int>.new(n + 1);
+
+    for (i = 0; i < m; i++) {
+        u[0] = i + 1;
+        for (j = 0; j < n; j++) {
+            if (a[i] == b[j]) {
+                u[j + 1] = t[j];
+            } else {
+                u[j + 1] = 1 + min3(t[j], t[j + 1], u[j]);
+            }
+        }
+        for (k = 0; k <= n; k++) {
+            t[k] = u[k];
+        }
+    }
+
+    return u[n];
+}

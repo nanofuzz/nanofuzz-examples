@@ -1,0 +1,84 @@
+// CircularBuffer data structure implementation in Virgil
+
+class CircularBuffer {
+    var buffer: Array<int>;
+    var head: int;
+    var tail: int;
+    var count: int;
+    var capacity: int;
+
+    new(capacity: int) {
+        this.capacity = capacity;
+        this.buffer = Array<int>.new(capacity);
+        this.head = 0;
+        this.tail = 0;
+        this.count = 0;
+    }
+
+    def push(val: int) -> bool {
+        if (count >= capacity) return false;
+        buffer[tail] = val;
+        tail = (tail + 1) % capacity;
+        count++;
+        return true;
+    }
+
+    def pop() -> int {
+        if (count == 0) return -1;
+        var val = buffer[head];
+        head = (head + 1) % capacity;
+        count--;
+        return val;
+    }
+
+    def peek() -> int {
+        if (count == 0) return -1;
+        return buffer[head];
+    }
+
+    def size() -> int {
+        return count;
+    }
+
+    def is_empty() -> bool {
+        return count == 0;
+    }
+
+    def is_full() -> bool {
+        return count == capacity;
+    }
+
+    def clear() {
+        head = 0;
+        tail = 0;
+        count = 0;
+    }
+}
+
+def test_circular_buffer(capacity: int, operations: Array<(string, int)>) -> bool {
+    if (capacity <= 0 || capacity > 64) return true;
+    var cb = CircularBuffer.new(capacity);
+
+    for (i = 0; i < operations.length; i++) {
+        var op = operations[i].0;
+        var val = operations[i].1;
+
+        if (op == "push") {
+            cb.push(val);
+        } else if (op == "pop") {
+            cb.pop();
+        } else if (op == "clear") {
+            cb.clear();
+        }
+    }
+
+    return true;
+}
+
+def test_circular_bufferGenerator(prng: () -> float) -> (int, Array<(string, int)>) {
+    var cap = 4;
+    var ops = Array<(string, int)>.new(2);
+    ops[0] = ("push", 10);
+    ops[1] = ("pop", 0);
+    return (cap, ops);
+}

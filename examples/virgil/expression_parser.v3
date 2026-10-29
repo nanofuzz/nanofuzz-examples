@@ -1,0 +1,41 @@
+// Arithmetic expression evaluator in Virgil
+
+def is_digit(c: byte) -> bool {
+    return c >= '0' && c <= '9';
+}
+
+def parse_int(s: string, start: int) -> (int, int) {
+    var val = 0;
+    var i = start;
+    while (i < s.length && is_digit(s[i])) {
+        val = val * 10 + (s[i] - '0');
+        i++;
+    }
+    return (val, i);
+}
+
+def evaluate_expression(expr: string) -> int {
+    if (expr.length == 0) return 0;
+    var i = 0;
+    var (val, next_i) = parse_int(expr, i);
+    i = next_i;
+
+    while (i < expr.length) {
+        var op = expr[i];
+        i++;
+        var (rhs, after_rhs) = parse_int(expr, i);
+        i = after_rhs;
+
+        if (op == '+') {
+            val = val + rhs;
+        } else if (op == '-') {
+            val = val - rhs;
+        } else if (op == '*') {
+            val = val * rhs;
+        } else if (op == '/') {
+            if (rhs != 0) val = val / rhs;
+        }
+    }
+
+    return val;
+}
