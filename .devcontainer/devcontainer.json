@@ -43,7 +43,7 @@
         }
       },
       "extensions": [
-        "penrose.nanofuzz",
+        "penrose.nanofuzz@0.4.1",
         "firsttris.vscode-jest-runner",
         "ms-python.python",
         "rust-lang.rust-analyzer",
