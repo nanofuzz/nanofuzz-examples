@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
 {
-  "name": "Node.js, Python, Rust, Java & OCaml",
+  "name": "Node.js, Python, Rust, Java, OCaml & Go",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
 
@@ -25,6 +25,9 @@
     "ghcr.io/devcontainers-extra/features/ocaml-opam:1": {
       "version": "5.2.0",
       "additionalPackages": "dune yojson msgpck ounit2"
+    },
+    "ghcr.io/devcontainers/features/go:1": {
+      "version": "latest"
     }
   },
 
@@ -32,7 +35,7 @@
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && opam pin add nanofuzz_runtime https://github.com/nanofuzz/nanofuzz/releases/download/v0.4.1/nanofuzz_runtime-0.4.1.tar.gz -y && opam exec -- dune runtest",
+  "postCreateCommand": "python3 -m pip install -r requirements.txt && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && yarn install && cargo build && mvn test && opam pin add nanofuzz_runtime https://github.com/nanofuzz/nanofuzz/releases/download/v0.4.1/nanofuzz_runtime-0.4.1.tar.gz -y && opam exec -- dune runtest && go test ./tests/go/...",
 
   // Configure tool-specific properties.
   "customizations": {
@@ -48,7 +51,8 @@
         "ms-python.python",
         "rust-lang.rust-analyzer",
         "vscjava.vscode-java-pack",
-        "ocamllabs.ocaml-platform"
+        "ocamllabs.ocaml-platform",
+        "golang.go"
       ]
     },
     "codespaces": {
