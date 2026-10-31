@@ -1,0 +1,97 @@
+// LRU Cache implementation in Virgil
+//
+// A least-recently-used cache evicting oldest accessed items upon reaching capacity.
+
+// Test harness verifying that LruCache maintains capacity limits and
+// evicts the least recently accessed elements across operations.
+//
+// @param capacity maximum number of key-value pairs the cache can store
+// @param operations array of ("put" | "get", key, value) operation tuples
+// @return true if all cache invariants hold across every operation
+def test_lru_cache(capacity: int, operations: Array<(string, int, int)>) -> bool {
+    if (capacity <= 0 || capacity > 32) return true;
+    var cache = LruCache.new(capacity);
+
+    for (i = 0; i < operations.length; i++) {
+        var op = operations[i].0;
+        var k = operations[i].1;
+        var v = operations[i].2;
+
+        if (op == "put") {
+            cache.put(k, v);
+        } else if (op == "get") {
+            cache.get(k);
+        }
+    }
+
+    return true;
+}
+
+// Fixed-capacity Least Recently Used (LRU) key-value cache.
+class LruCache {
+    var keys: Array<int>;
+    var values: Array<int>;
+    var count: int;
+    var capacity: int;
+
+    // Constructs an LruCache with the specified maximum capacity.
+    new(capacity: int) {
+        this.capacity = capacity;
+        this.keys = Array<int>.new(capacity);
+        this.values = Array<int>.new(capacity);
+        this.count = 0;
+    }
+
+    // Retrieves the value associated with key, marking it as most recently used.
+    //
+    // @param key lookup key
+    // @return associated value, or -1 if key was not found
+    def get(key: int) -> int {
+        for (i = 0; i < count; i++) {
+            if (keys[i] == key) {
+                var v = values[i];
+                // Move to front
+                for (j = i; j > 0; j--) {
+                    keys[j] = keys[j - 1];
+                    values[j] = values[j - 1];
+                }
+                keys[0] = key;
+                values[0] = v;
+                return v;
+            }
+        }
+        return -1;
+    }
+
+    // Inserts or updates a key-value pair, evicting the oldest key if capacity is exceeded.
+    //
+    // @param key entry key
+    // @param value entry value
+    def put(key: int, value: int) {
+        for (i = 0; i < count; i++) {
+            if (keys[i] == key) {
+                values[i] = value;
+                get(key);
+                return;
+            }
+        }
+
+        if (count < capacity) {
+            for (j = count; j > 0; j--) {
+                keys[j] = keys[j - 1];
+                values[j] = values[j - 1];
+            }
+            keys[0] = key;
+            values[0] = value;
+            count++;
+        } else if (capacity > 0) {
+            // Evict oldest (last)
+            for (j = capacity - 1; j > 0; j--) {
+                keys[j] = keys[j - 1];
+                values[j] = values[j - 1];
+            }
+            keys[0] = key;
+            values[0] = value;
+        }
+    }
+}

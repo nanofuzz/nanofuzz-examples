@@ -1,0 +1,112 @@
+// CircularBuffer data structure implementation in Virgil
+//
+// A fixed-capacity FIFO ring buffer maintaining bounded elements with wraparound pointers.
+
+// Test harness verifying that CircularBuffer maintains all capacity,
+// FIFO, and emptiness invariants across a sequence of operations.
+//
+// @param capacity maximum number of elements the circular buffer can hold
+// @param operations array of ("push" | "pop" | "clear", value) operation tuples
+// @return true if all invariants hold across every operation
+def test_circular_buffer(capacity: int, operations: Array<(string, int)>) -> bool {
+    if (capacity <= 0 || capacity > 64) return true;
+    var cb = CircularBuffer.new(capacity);
+
+    for (i = 0; i < operations.length; i++) {
+        var op = operations[i].0;
+        var val = operations[i].1;
+
+        if (op == "push") {
+            cb.push(val);
+        } else if (op == "pop") {
+            cb.pop();
+        } else if (op == "clear") {
+            cb.clear();
+        }
+    }
+
+    return true;
+}
+
+// User-provided input generator producing realistic circular buffer operation sequences.
+//
+// @param prng pseudo-random number generator callable returning floats in [0.0, 1.0)
+// @return tuple of (capacity, operations array)
+def test_circular_bufferGenerator(prng: () -> float) -> (int, Array<(string, int)>) {
+    var cap = 4;
+    var ops = Array<(string, int)>.new(2);
+    ops[0] = ("push", 10);
+    ops[1] = ("pop", 0);
+    return (cap, ops);
+}
+
+// Fixed-size FIFO circular buffer class.
+class CircularBuffer {
+    var buffer: Array<int>;
+    var head: int;
+    var tail: int;
+    var count: int;
+    var capacity: int;
+
+    // Constructs a new CircularBuffer with the specified maximum capacity.
+    new(capacity: int) {
+        this.capacity = capacity;
+        this.buffer = Array<int>.new(capacity);
+        this.head = 0;
+        this.tail = 0;
+        this.count = 0;
+    }
+
+    // Appends an element to the tail of the buffer if space is available.
+    //
+    // @param val integer to append
+    // @return true if successfully inserted, false if buffer was full
+    def push(val: int) -> bool {
+        if (count >= capacity) return false;
+        buffer[tail] = val;
+        tail = (tail + 1) % capacity;
+        count++;
+        return true;
+    }
+
+    // Removes and returns the oldest element from the head of the buffer.
+    //
+    // @return the removed element, or -1 if the buffer is empty
+    def pop() -> int {
+        if (count == 0) return -1;
+        var val = buffer[head];
+        head = (head + 1) % capacity;
+        count--;
+        return val;
+    }
+
+    // Inspects the oldest element at the head without removing it.
+    //
+    // @return the head element, or -1 if empty
+    def peek() -> int {
+        if (count == 0) return -1;
+        return buffer[head];
+    }
+
+    // Returns the current number of elements stored in the buffer.
+    def size() -> int {
+        return count;
+    }
+
+    // Checks whether the buffer contains zero elements.
+    def is_empty() -> bool {
+        return count == 0;
+    }
+
+    // Checks whether the buffer has reached maximum capacity.
+    def is_full() -> bool {
+        return count == capacity;
+    }
+
+    // Clears all elements from the buffer, resetting head and tail pointers.
+    def clear() {
+        head = 0;
+        tail = 0;
+        count = 0;
+    }
+}

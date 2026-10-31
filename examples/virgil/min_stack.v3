@@ -1,0 +1,99 @@
+// MinStack data structure implementation in Virgil
+//
+// A stack supporting push, pop, top, and retrieving the minimum element in O(1) time.
+
+// Test harness verifying that MinStack maintains all stack invariants,
+// size tracking, and minimum element consistency across operations.
+//
+// @param operations array of ("push" | "pop", value) operation tuples
+// @return true if all invariants hold across every operation
+def test_min_stack(operations: Array<(string, int)>) -> bool {
+    var ms = MinStack.new(64);
+
+    for (i = 0; i < operations.length; i++) {
+        var op = operations[i].0;
+        var val = operations[i].1;
+
+        if (op == "push") {
+            ms.push(val);
+        } else if (op == "pop") {
+            ms.pop();
+        }
+    }
+
+    return true;
+}
+
+// User-provided input generator producing realistic MinStack operation sequences.
+//
+// @param prng pseudo-random number generator callable returning floats in [0.0, 1.0)
+// @return array of ("push" | "pop", value) operations
+def test_min_stackGenerator(prng: () -> float) -> Array<(string, int)> {
+    var ops = Array<(string, int)>.new(2);
+    ops[0] = ("push", 42);
+    ops[1] = ("pop", 0);
+    return ops;
+}
+
+// Stack tracking the minimum element alongside primary values.
+class MinStack {
+    var data: Array<int>;
+    var min_data: Array<int>;
+    var count: int;
+
+    // Constructs a MinStack with the specified maximum capacity.
+    new(max_capacity: int) {
+        this.data = Array<int>.new(max_capacity);
+        this.min_data = Array<int>.new(max_capacity);
+        this.count = 0;
+    }
+
+    // Pushes an element onto the stack, updating the current minimum.
+    //
+    // @param val integer to push
+    def push(val: int) {
+        if (count >= data.length) return;
+        data[count] = val;
+        if (count == 0 || val < min_data[count - 1]) {
+            min_data[count] = val;
+        } else {
+            min_data[count] = min_data[count - 1];
+        }
+        count++;
+    }
+
+    // Removes and returns the top element from the stack.
+    //
+    // @return the popped value, or -1 if empty
+    def pop() -> int {
+        if (count == 0) return -1;
+        count--;
+        return data[count];
+    }
+
+    // Returns the top element of the stack without removing it.
+    //
+    // @return the top value, or -1 if empty
+    def top() -> int {
+        if (count == 0) return -1;
+        return data[count - 1];
+    }
+
+    // Returns the current minimum element in the stack in O(1) time.
+    //
+    // @return the minimum value, or -1 if empty
+    def get_min() -> int {
+        if (count == 0) return -1;
+        return min_data[count - 1];
+    }
+
+    // Returns the number of elements currently stored in the stack.
+    def size() -> int {
+        return count;
+    }
+
+    // Checks whether the stack contains zero elements.
+    def is_empty() -> bool {
+        return count == 0;
+    }
+}

@@ -1,0 +1,51 @@
+// Adapted from RosettaCode: https://rosettacode.org/wiki/Levenshtein_distance
+//
+// The Levenshtein distance is a metric for measuring the difference
+// between two sequences (an edit distance). The Levenshtein distance
+// between two strings (a and b) is defined as the minimum number of edits
+// needed to transform one string into the other, with allowable operations
+// being insertion, deletion, or substitution of a single character.
+//
+// @param a the original string
+// @param b the target string after editing
+// @return the minimum number of edit operations required
+def levenshtein(a: string, b: string) -> int {
+    var m = a.length;
+    var n = b.length;
+
+    var t = Array<int>.new(n + 1);
+    for (j = 0; j <= n; j++) {
+        t[j] = j;
+    }
+
+    var u = Array<int>.new(n + 1);
+
+    for (i = 0; i < m; i++) {
+        u[0] = i + 1;
+        for (j = 0; j < n; j++) {
+            if (a[i] == b[j]) {
+                u[j + 1] = t[j];
+            } else {
+                u[j + 1] = 1 + min3(t[j], t[j + 1], u[j]);
+            }
+        }
+        for (k = 0; k <= n; k++) {
+            t[k] = u[k];
+        }
+    }
+
+    return u[n];
+}
+
+// Computes the minimum of three 32-bit integers.
+//
+// @param a first integer
+// @param b second integer
+// @param c third integer
+// @return the smallest of a, b, and c
+def min3(a: int, b: int, c: int) -> int {
+    var m = a;
+    if (b < m) m = b;
+    if (c < m) m = c;
+    return m;
+}
